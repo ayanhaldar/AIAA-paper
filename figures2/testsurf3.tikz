@@ -1,0 +1,10 @@
+ \begin{tikzpicture}
+\begin{axis}[]
+\addplot3[surf] 
+table [] {
+	1 2 3
+	2 3 4
+	2 3 4
+};
+\end{axis}
+\end{tikzpicture}

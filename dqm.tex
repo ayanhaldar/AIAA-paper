@@ -1,0 +1,1392 @@
+\documentclass[journal]{new-aiaa}
+
+\usepackage{lineno,hyperref}
+\modulolinenumbers[5]
+\usepackage{lineno,hyperref}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subfig}
+%\usepackage{subcaption}
+\usepackage{epstopdf}
+\usepackage{subfiles}
+%\usepackage{gensymb}
+\usepackage{xcolor}
+\usepackage{verbatim}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{tikzscale}
+\usepackage{mathabx}
+\usepackage{epstopdf}
+\usepackage[utf8]{inputenc}
+\usepackage{booktabs}
+\usepackage{dcolumn}
+
+\usepackage[boxed]{algorithm2e}
+\usepackage{mathrsfs}
+\usepackage{breqn}
+\usepackage{dsfont}
+\usepackage[labelfont=bf]{caption}
+\usepackage{amsmath,bm}
+\usepackage{array,multirow}
+\newcommand\myatop[2]{\left[{{#1}\atop#2}\right]} % "wrapper macro"
+
+\title{Tailoring Snap-through Loads in Variable Stiffness Composites }
+
+ \author{
+     A.Haldar%
+    \thanks{PhD Student, Institute of Structural Analysis, Appelstraße 9A, Hannover 30167, Germany}
+  ,\ E.Jansen% 
+  \thanks{Head of the group, Institute of Structural Analysis, Appelstraße 9A,  Hannover 30167, Germany}
+  \ and R.Rolfes% 
+  \thanks{Professor, Institute of Structural Analysis, Appelstraße 9A,  Hannover 30167, Germany}
+  \\
+  {\normalsize\itshape
+   Leibniz Universität Hannover, 30167, Germany}\\
+  \and
+  P.M.Weaver%
+   \thanks{§Professor in Lightweight Structures, Advanced Composite Centre for Innovation and Science, Queen’s Building, University Walk and Bernal Chair in Composite Materials and Structures, Bernal Institute,Limerick, Ireland and Member AIAA.}\\
+  {\normalsize\itshape
+  University of Bristol, Bristol, England BS8 1TR, United Kingdom}\\
+ {\normalsize\itshape University of Limerick, Limerick, Ireland}
+}
+
+
+ % Data used by 'handcarry' option if invoked
+ %  \AIAApapernumber{YEAR-NUMBER}
+ %  \AIAAconference{Conference Name, Date, and Location}
+ %  \AIAAcopyright{\AIAAcopyrightD{YEAR}}
+
+ % Define commands to assure consistent treatment throughout document
+ % \newcommand{\eqnref}[1]{(\ref{#1})}
+ % \newcommand{\class}[1]{\texttt{#1}}
+ % \newcommand{\package}[1]{\texttt{#1}}
+  %\newcommand{\file}[1]{\texttt{#1}}
+ % \newcommand{\BibTeX}{\textsc{Bib}\TeX}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Snap-through of multistable composites is a complex phenomenon that is difficult to characterize using simple analytical models. However, it is of paramount importance that the snap-through forces are accurately predicted if they are to be used in morphing structures. In this work, an accurate yet computationally fast model is proposed that computes the snap-through forces of variable stiffness (VS) laminates. The membrane problem is first solved exactly using differential quadrature method (DQM), and consequently, the in-plane stresses are written in terms of curvatures. The out-of-plane displacements are expressed in the form of Legendre functions, where the unknown coefficients of the displacement function are found using the Rayleigh-Ritz formulation. The calculated snap-through loads are then compared with Finite Element (FE) results.
+\end{abstract}
+
+\section{Introduction}
+
+In the field of aerospace	 industry, shape changing capabilities offers significant improvement in the performance and can efficiently meet different operational requirements. In the recent past, multistable structures have shown a great potential in morphing applications \cite{Schultz2007,Mattioni2008application,Arrieta2014,Daynes2009,Diaconu2008}, especially due to the existence of multiple stable shapes and their ability to remain in these stable states without any external forces.
+
+Multistable structures can be generated either by utilizing the differential thermal coefficient of an unsymmetric laminate in orthogonal directions \cite{Hyer1981}, or as a result of Gaussian curvature in initially curved shells \cite{seffen2007}, or due to prestressing \cite{Daynes2009}. 
+
+However, thermally induced bistable shapes of unsymmetric laminates often result in a narrow range of shapes limiting its use in different applications. Recently, it was observed in Haldar et al. \cite{Haldar2017}
+that variable stiffness (VS) laminates could be used to further tailor the stiffness properties of the plate, leading to a wider range of stable configurations than the constant stiffness laminates. For example, a cylindrical bistable configuration without any twisting curvature is typically constructed from $[0_n/90_n]$ unsymmetrical laminate. Similar shape can be also be generated using different options of VS configurations. Such composite laminates can be further tailored for the snap-through forces which an important parameter for efficient design of morphing structures.
+
+In this paper, we exploit VS laminates to tailor the snap-through loads. We calculate the snap-through forces using a computationally efficient and robust technique build upon the method described in Lamacchia et al. \cite{Lamacchia2015}. It is previously seen in Diaconu et al. \cite{Diaconu2009}, that even for constant fiber laminates, the uniform curvature assumption fails to predict the snap-through loads, as it involves intermediate non-cylindrical shapes, which is also observed by Potter et al. 	\cite{Potter2007}experimentally.    
+
+Higher order displacements are therefore necessary to capture the complex phenomenon of the snap-through event. However, with such approximations, the in-plane displacement or strain field results in expressions leading to high computational costs as observed in Mattioni et al. \cite{Mattioni2009} and Pirrera et al. \cite{Pirrera2010}. Nonlinear finite element (FE) proves to be an accurate tool, but high computational efforts may not be suitable for optimization or parametric studies. Therefore, a fast and sufficiently accurate analytical tool is required to study the snap-through behavior of VS laminates.
+
+Lamacchia et al.\cite{Lamacchia2015} showed that Differential Quadrature Method (DQM) proves to be computationally efficient and robust tool to capture the snap-through behavior of straight fiber laminate. The key to this formulation is to decouple the bending and stretching parts from the total strain energy, using semi-inverse constitutive relation. As suggested by Vidoli et al.\cite{Vidoli2013}, it is crucial solving the membrane problem with negligible numerical error to evaluate the stretching energy accurately. In order to reduce the number of unknowns, the in-plane forces are expressed once and for all in terms of curvatures and thermal strains, using the compatibility equation and the constitutive relations. The total energy is then expressed as a function of just curvatures and thermal strains.
+
+In this paper, the work of Lamacchia et al.\cite{Lamacchia2015} is extended for VS laminates.
+% A linear variation of the fiber orientation angle proposed by Gürdal et al.\cite{Gurdal2008} is considered. 
+The snap-through is triggered by applying four concentrated force at the corner of the plate. The contribution of the external forces is subsequently added to the total energy of the system.
+
+All the possible equilibrium states are found by minimizing the total energy. The Hessian of the total potential energy with respect to the unknown coefficients of the displacement function indicates if the solution is stable or unstable. The developed model is subsequently compared with the FE results.
+
+\section{Variable stiffness model}
+\label{Path}
+In this paper,  a curvilinear fiber path definition for the composite laminate is employed.  Although there can be different ways to vary the fiber path in a curvilinear pattern, the linear variation of the fiber orientation angle proposed by G{\"u}rdal et al. \cite{Gurdal2008} is considered in this work. Such linear variation is more practical due to its adaptability to  manufacturing constraints, and also useful in building simpler analytical models.
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[ width=.75\textwidth ]{figures2/fiberdef.pdf}
+	\caption{Parameters defining the curvilinear fiber path}
+	\label{fig:fiberdef}
+\end{figure}
+
+The fiber orientation angle $\theta$  is defined as follows:
+
+\begin{equation}
+\label{fibdef2}
+\begin{aligned}
+\theta(x')=
+\phi+\frac{\left(T_1-T_0\right)|x'|}{d} + T_0
+\end{aligned}
+\end{equation}
+where
+\begin{equation}
+\label{fibdef3}
+\begin{aligned}
+x'&= x\cos{\phi}+y\sin{\phi}
+% d &= \left(X_1-X_0\right)\cos{\phi}+ %\left(Y_1-Y_0\right)\sin{\phi}
+\end{aligned}
+\end{equation}
+
+
+\section{Model}
+\subsection{Kinematics}
+A material point in the deformed configuration can be expressed as $\textbf{x} = \textbf{X} + \textbf{u}$, where $\textbf{u} (u, v, w)$ denotes the displacement vector in the $x$, $y$ and $z$ direction, whereas $\textbf{x}$, $\textbf{X}$ identify the position vectors in the undeformed and in the reference configuration, respectively. The components of the displacement vector are defined accordingly as:
+\begin{equation}
+\label{disp}
+u(x,y,z)  = u_{0}(x,y)  -  z \frac{\partial w_{0}}{\partial x},  \hspace {0.2cm}
+v(x,y,z)  = v_{0}(x,y)  -  z \frac{\partial w_{0}}{\partial y} ,  \hspace {0.2cm}
+w(x,y,z)  = w_{0}(x,y)
+\end{equation}
+where the subscript $0$ identifies the mid-plane displacements. 
+
+The strain components includes non-linear von K\'arm\'an strains under the assumption of small strains and moderate rotations are given by:
+%\begin{equation}
+%\label{strain}
+%\varepsilon_{xx}   = \frac{\partial u}{\partial x}  +  \frac{1}{2}  \left(\frac{\partial w}{\partial x} \right)^2,  \hspace {0.2cm} \varepsilon_{yy}  = \frac{\partial v}{\partial y}  +  \frac{1}{2}  \left(\frac{\partial w}{\partial y} \right)^2,  \hspace {0.2cm}
+%\gamma_{xy} = \frac{\partial u}{\partial y} + \frac{\partial v}{\partial x} + \frac{\partial w}{\partial x}\frac{\partial w}{\partial y}
+%\end{equation}
+%which shows the non-linear strain displacement relationships. By inserting Eq. \eqref{disp} into Eq. \eqref{strain}, the strain relations can be rearranged as:
+%\begin{equation}
+%\label{strain1}
+%\boldsymbol \varepsilon =  \begin{bmatrix}
+%\varepsilon_{xx} \\ \varepsilon_{yy} \\ \gamma_{xy}
+%\end{bmatrix} =
+%\begin{bmatrix}
+%\epsilon_{xx} \\ \epsilon_{yy} \\ \epsilon_{xy}
+%\end{bmatrix} + z
+%\begin{bmatrix}
+%\kappa_{xx} \\ \kappa_{yy} \\ \kappa_{xy}
+%\end{bmatrix}  =
+%\begin{bmatrix}
+%\frac{\partial u_{0}}{\partial x}  +  \frac{1}{2}  \left(\frac{\partial w_{0}}{\partial x} \right)^2 \\
+%\frac{\partial v_{0}}{\partial y}  +  \frac{1}{2}  \left(\frac{\partial w_{0}}{\partial y} \right)^2 \\
+%\frac{\partial u_{0}}{\partial y}  + \frac{\partial v_{0}}{\partial x} +\frac{\partial w_{0}}{\partial x}\frac{\partial w_{0}}{\partial y}
+%\end{bmatrix} +
+%z   \begin{bmatrix}
+%- \frac{\partial^{2} w_{0}}{\partial x^{2}} \\
+%- \frac{\partial^{2} w_{0}}{\partial y^{2}}  \\
+%-2 \frac{\partial^{2} w_{0}}{\partial x \partial y}
+%\end{bmatrix} =
+%\epsilon + z  \kappa,
+%\end{equation}
+%where $\epsilon$ and $\kappa$ represent the mid-plane strain and curvature vectors, respectively.
+
+
+\begin{equation}
+\label{strain}
+\epsilon_{xx}   = \frac{\partial u}{\partial x}  +  \frac{1}{2}  \left(\frac{\partial w}{\partial x} \right)^2,  \hspace {0.2cm} \epsilon_{yy}  = \frac{\partial v}{\partial y}  +  \frac{1}{2}  \left(\frac{\partial w}{\partial y} \right)^2,  \hspace {0.2cm}
+\gamma_{xy} = \frac{\partial u}{\partial y} + \frac{\partial v}{\partial x} + \frac{\partial w}{\partial x}\frac{\partial w}{\partial y}
+\end{equation}
+which shows the non-linear strain displacement relationships. By inserting Eq. \eqref{disp} into Eq. \eqref{strain}, the strain relations can be rearranged as:
+\begin{equation}
+\label{strain1}
+\boldsymbol \epsilon =  \begin{bmatrix}
+\epsilon_{xx} \\ \epsilon_{yy} \\ \gamma_{xy}
+\end{bmatrix} =
+\begin{bmatrix}
+\varepsilon_{xx} \\ \varepsilon_{yy} \\ \varepsilon_{xy}
+\end{bmatrix} + z
+\begin{bmatrix}
+\kappa_{xx} \\ \kappa_{yy} \\ \kappa_{xy}
+\end{bmatrix}  =
+\begin{bmatrix}
+\frac{\partial u_{0}}{\partial x}  +  \frac{1}{2}  \left(\frac{\partial w_{0}}{\partial x} \right)^2 \\
+\frac{\partial v_{0}}{\partial y}  +  \frac{1}{2}  \left(\frac{\partial w_{0}}{\partial y} \right)^2 \\
+\frac{\partial u_{0}}{\partial y}  + \frac{\partial v_{0}}{\partial x} +\frac{\partial w_{0}}{\partial x}\frac{\partial w_{0}}{\partial y}
+\end{bmatrix} +
+z   \begin{bmatrix}
+- \frac{\partial^{2} w_{0}}{\partial x^{2}} \\
+- \frac{\partial^{2} w_{0}}{\partial y^{2}}  \\
+-2 \frac{\partial^{2} w_{0}}{\partial x \partial y}
+\end{bmatrix} =
+\boldsymbol \varepsilon + z  \boldsymbol \kappa,
+\end{equation}
+where $\boldsymbol \varepsilon$ and $\boldsymbol \kappa$ represent the mid-plane strain and curvature vectors, respectively.
+
+
+\subsection{Energy}
+
+The total strain energy can be written as:
+
+%\begin{equation}
+%\label{PotEnergy}
+%\Pi =  \int_{-L/2}^{L/2} \int_{-L/2}^{L/2} \left(\frac{1}{2} \begin{bmatrix}
+%\boldsymbol \varepsilon \\ \boldsymbol \kappa
+%\end{bmatrix}^{T} \begin{bmatrix}
+%\textbf{A}(x,y)  &  \textbf{B}(x,y) \\
+%\textbf{B}(x,y) &   \textbf{D}(x,y)
+%\end{bmatrix}
+%\begin{bmatrix}
+%\boldsymbol \varepsilon \\ \boldsymbol \kappa
+%\end{bmatrix} -
+%\begin{bmatrix}
+%\textbf{N}^{th}(x,y) \\ \textbf{M}^{th}(x,y)
+%\end{bmatrix}^{T} \begin{bmatrix}
+%\boldsymbol \varepsilon \\ \boldsymbol \kappa
+%\end{bmatrix}  \right) \text{d}x \text{ d}y
+%\end{equation}
+
+
+\begin{align}
+%{U}= \frac{1}{2}\int_{S}\left[A(x,y)(e-f)(e-f) + {B(x,y)}(e-f) .(k-h) + {D(x,y)}(k-h).(k-h)\right]d\bar{S}
+{\Pi}= \frac{1}{2}\int_{S}\left[\boldsymbol\varepsilon^T\boldsymbol A(x,y)\boldsymbol \varepsilon\right]d\bar{S} + \int_{S}\left[\boldsymbol\varepsilon^T{\boldsymbol B(x,y)}\boldsymbol\kappa\right]d\bar{S} + \frac{1}{2}\int_{S}\left[\boldsymbol \kappa\boldsymbol D(x,y) \boldsymbol\kappa\right]d\bar{S} - \int_{S} \boldsymbol N^{th}\boldsymbol\varepsilon d\bar{S} - \int_{S} \boldsymbol M^{th}\boldsymbol\kappa d\bar{S}
+\end{align}
+where $f$ and $h$ represents deformations associated with thermal effects.
+It should also be noted that as the fiber orientation is a function of $x$ and $y$, the ${ABD}$ matrix also varies along the coordinates of a plate. This flexibility to change the stiffness terms of the plate as a function of the coordinates of the composite gives the designer a wide range of tailoring possibilities.
+
+Using the semi-inverse formulation, the strains can be written as follows:
+
+\begin{equation}
+\boldsymbol\varepsilon= \boldsymbol A^\ast(\boldsymbol N + \boldsymbol N^{th})+ \boldsymbol B^\ast \boldsymbol\kappa
+\label{eqn:semiconst}
+\end{equation}
+the bending and the membrane part of total strain energy can be decoupled and written as:
+% \begin{equation}
+% %{U}= \frac{1}{2}\int_{S}\left[A(x,y)(e-f)(e-f) + {B(x,y)}(e-f) .(k-h) + {D(x,y)}(k-h).(k-h)\right]d\bar{S}
+% {U}= \frac{1}{2}\int_{S}\left[\boldsymbol\varepsilon^T\boldsymbol A(x,y)\boldsymbol \varepsilon\right]d\bar{S} + \int_{S}\left[\boldsymbol\varepsilon^T{\boldsymbol B(x,y)}\boldsymbol\kappa\right]d\bar{S} + \frac{1}{2}\int_{S}\left[\boldsymbol \kappa\boldsymbol D(x,y) \boldsymbol\kappa\right]d\bar{S} - \int_{S} \boldsymbol N^{th}\boldsymbol\varepsilon d\bar{S} - \int_{S} \boldsymbol M^{th}\boldsymbol\kappa d\bar{S}
+% \end{equation}
+\begin{equation}
+\begin{aligned}
+{\Pi}= \frac{1}{2}\int_{S}\left[\boldsymbol N^T\boldsymbol A^\ast(x,y)\boldsymbol N\right]d\bar{S} +   & \frac{1}{2}\int_{S}\left[\boldsymbol\kappa^T\boldsymbol D^\ast(x,y)\kappa\varepsilon\right]d\bar{S} - \frac{1}{2}\int_{S}\left[(\boldsymbol {N}^{th})^T\boldsymbol A^\ast(x,y)\boldsymbol N^{th}\right]d\bar{S}  \\ & -  \int_{S}\left[(\boldsymbol {N}^{th})^T\boldsymbol B^\ast(x,y)\boldsymbol \kappa \right]d\bar{S}- \int_{S}\left[(\boldsymbol {M}^{th})^T\boldsymbol I\boldsymbol \kappa \right]d\bar{S}\\
+\end{aligned}
+\end{equation}
+\begin{eqnarray}
+\begin{aligned}
+\boldsymbol{A}^\ast &:= \boldsymbol{A}^{-1} \\
+\boldsymbol{B}^\ast &:= -\boldsymbol{A}^{-1} \boldsymbol{B}  \\
+\boldsymbol{D}^\ast &:= \boldsymbol{D} - \boldsymbol{B}^{T} \boldsymbol{A}^{-1} \boldsymbol{B}  \\ 
+\end{aligned}
+\end{eqnarray}
+where $N$ is the membrane stress field.
+This formulation therefore clearly reveals the independent contribution of bending and stretching in the total strain energy.
+\subsection{Membrane Problem}
+It is important to note that the assumed strain and displacement fields satisfy the compatibility equation of a curved surface, as given in \cite{Calladine83}:
+\begin{equation}
+\label{eqn:compat}
+\text{curl}\text{curl}\,\boldsymbol\varepsilon= \frac{\partial^2 \varepsilon_y }{\partial x^2} + \frac{\partial^2 \varepsilon_x }{\partial y^2} -
+\frac{\partial^2 \gamma_{xy} }{\partial x  \partial y}=\text{det}\,\kappa= \kappa_{xx}\kappa_{yy} - {\kappa_{xy}^2}/{4}
+\end{equation}
+The in-plane equilibrium equations can be written as:
+\begin{eqnarray}
+\label{eqn:eqm}
+\begin{aligned}
+\text{div} \boldsymbol{N} &= 0\quad \text{on} \: S, \qquad  \boldsymbol{N}. \boldsymbol{n} = 0 \quad \text{on} \: \partial S
+\end{aligned}
+\end{eqnarray}
+From the semi-constitutive relation Eq.\ref{eqn:semiconst}, the in-plane strains can be written in terms of stresses and curvatures as:
+%\begin{eqnarray}
+%\label{eqn:constut}
+%\begin{aligned}
+%N&=&A(e-f)+B(k-h)\\
+%e&=&{A}^\ast N +\widetilde{B}(k-h)+f
+%\end{aligned}
+%\end{eqnarray}
+%
+%%Using Eq.\ref{eqn:compat} and , the in-plane strains are replaced by the membrane stresses in the compatibility equation.
+\begin{eqnarray}
+\label{eqn:compat2}
+\begin{aligned}
+\text{curl}\text{curl}(\boldsymbol{A}^\ast\boldsymbol{N}) &=\text{det}\boldsymbol\kappa - \text{curl}\text{curl}\left(\boldsymbol{A}^\ast\boldsymbol{N}^{th}+\boldsymbol{B}^\ast\boldsymbol\kappa\right):= g,  \quad  \text{on} \: S
+\end{aligned}
+\end{eqnarray}
+where the term  $\text{curl}\text{curl}\left(\boldsymbol{A}^\ast\boldsymbol{N}^{th}+\boldsymbol{B}^\ast\boldsymbol\kappa\right)$ is non-zero for VS laminates.
+
+
+%The stress function N can be written in terms of the Airy stress function $\phi$ as:\\
+%\begin{equation}
+%\label{eqn:airy}
+%N_{x}=\Phi_{,yy}, \quad N_{y}=\Phi_{,xx},\quad  N_{xy}=-\Phi_{,xy}
+%\end{equation}
+
+%On substituting \ref{eqn:airy} in \ref{eqn:compat2}, we get an differential equation of Airy stress function $\phi$ in terms of $\kappa$ and $h$ and $f$. 
+%\begin{equation}
+%\left(A_{11}(x,y)+A_{12}(x,y)\right) \phi ^{(0,4)}(x,y)+\\
+%\left(2 A_{11}{}^{(0,1)}(x,y)+\\ 2 A_{12}{}^{(0,1)}(x,y)-A_{16}{}^{(1,0)}(x,y)-A_{26}{}^{(1,0)}(x,y)\right) \phi ^{(0,3)}(x,y)+\\
+%\left(-3A_{16}{}^{(0,1)}(x,y)-A_{26}{}^{(0,1)}(x,y)+2 \left(A_{12}{}^{(1,0)}(x,y)+ \\ A_{22}{}^{(1,0)}(x,y)\right)+A_{66}{}^{(1,0)}(x,y)\right) \phi ^{(1,2)}(x,y)- \\ 2 A_{16}(x,y) \phi
+%^{(1,3)}(x,y)+\left(A_{11}{}^{(0,2)}(x,y)+A_{12}{}^{(0,2)}(x,y)-\\ A_{16}{}^{(1,1)}(x,y)-A_{26}{}^{(1,1)}(x,y)+\\ A_{12}{}^{(2,0)}(x,y)+A_{22}{}^{(2,0)}(x,y)\right) \phi
+%^{(0,2)}(x,y)-\left(A_{16}{}^{(0,2)}(x,y)-A_{66}{}^{(1,1)}(x,y)+A_{26}{}^{(2,0)}(x,y)\right) \phi ^{(1,1)}(x,y)+A_{66}{}^{(0,1)}(x,y) \phi ^{(2,1)}(x,y)-2 A_{26}{}^{(1,0)}(x,y) \phi
+%^{(2,1)}(x,y)+\left(A_{12}(x,y)+A_{22}(x,y)+A_{66}(x,y)\right) \phi ^{(2,2)}(x,y)-A_{26}(x,y) \left(\phi ^{(1,3)}(x,y)+\phi ^{(3,1)}(x,y)\right)+B_{16}(x,y)
+%\left(k_{\text{xy}}{}^{(0,2)}(x,y)-k_{\text{xx}}{}^{(1,1)}(x,y)\right)+k_{\text{xx}}(x,y)
+%\left(B_{11}{}^{(0,2)}(x,y)-B_{16}{}^{(1,1)}(x,y)+B_{12}{}^{(2,0)}(x,y)-k_{\text{yy}}(x,y)\right)+B_{12}(x,y) \left(k_{\text{xx}}{}^{(2,0)}(x,y)+k_{\text{yy}}{}^{(0,2)}(x,y)\right)+B_{11}(x,y)
+%k_{\text{xx}}{}^{(0,2)}(x,y)+\left(2 B_{11}{}^{(0,1)}(x,y)-B_{16}{}^{(1,0)}(x,y)\right) k_{\text{xx}}{}^{(0,1)}(x,y)-\left(B_{16}{}^{(0,1)}(x,y)-2 B_{12}{}^{(1,0)}(x,y)\right)
+%k_{\text{xx}}{}^{(1,0)}(x,y)-B_{26}{}^{(1,0)}(x,y) \left(k_{\text{yy}}{}^{(0,1)}(x,y)-2 k_{\text{xy}}{}^{(1,0)}(x,y)\right)+B_{26}(x,y)
+%\left(k_{\text{xy}}{}^{(2,0)}(x,y)-k_{\text{yy}}{}^{(1,1)}(x,y)\right)+\left(2 B_{16}{}^{(0,1)}(x,y)-B_{66}{}^{(1,0)}(x,y)\right) k_{\text{xy}}{}^{(0,1)}(x,y)-B_{66}{}^{(0,1)}(x,y)
+%k_{\text{xy}}{}^{(1,0)}(x,y)-B_{66}(x,y) k_{\text{xy}}{}^{(1,1)}(x,y)+k_{\text{xy}}(x,y) \left(B_{16}{}^{(0,2)}(x,y)-B_{66}{}^{(1,1)}(x,y)+B_{26}{}^{(2,0)}(x,y)+k_{\text{xy}}(x,y)\right)+2
+%B_{12}{}^{(0,1)}(x,y) k_{\text{yy}}{}^{(0,1)}(x,y)-\left(B_{26}{}^{(0,1)}(x,y)-2 B_{22}{}^{(1,0)}(x,y)\right)
+%k_{\text{yy}}{}^{(1,0)}(x,y)+\left(B_{12}{}^{(0,2)}(x,y)-B_{26}{}^{(1,1)}(x,y)+B_{22}{}^{(2,0)}(x,y)\right) k_{\text{yy}}(x,y)+B_{22}(x,y) k_{\text{yy}}{}^{(2,0)}(x,y)
+%\end{equation}
+It is important to solve differential equation accurately, with good estimation of the in-plane forces. It has been previuosly observed in Pirrera et al. (\cite{Pirrera2010}), higher order polynomial are essential to capture the snap-through with good accuracy. However, in such model, dofs increases signicantly and thus as shown in Vidoli \cite{Vidoli2013} and Lamacchia et al. \cite{Lamacchia2015}, the importance of reducing the degrees of freedom by evaluating once and by all, the membrane problem accurately.The membrane problem can be solved by applying DQM to Eq. \ref{eqn:compat2}, where the individual terms \ref{eqn:compat2} are converted into DQM matrices of weighting coefficients which are solved over Chebyshev-Gauss-Lobatto mesh grid.
+
+\section{Non-Dimensional Form}
+\subsection{Formulation}
+To reduce the ill-conditioning of the nonlinear model, a non-dimensionalisation is been performed, with $( ^{\sim})$  representing the non-dimentionalised form. In this section all the components are defined in the  dimensionless form. The coordinate axis is defined : $x=L_x\tilde{x}$ and $y=L_y\tilde{y} $ and therefore the displacement vectors as:
+\begin{eqnarray}
+\begin{aligned}
+u&=U_d\tilde{u}, v=V_d\tilde{v}, w=W_d\tilde{w}, 
+\end{aligned}
+\label{eqn:nondimdisp}
+\end{eqnarray}
+Further, the strain components can the therefore be written as dimensionless quantities as:
+\begin{eqnarray}
+\begin{aligned}
+\boldsymbol{\varepsilon} &= \boldsymbol{E\tilde{\varepsilon}},  \boldsymbol{\kappa}=\boldsymbol{K\tilde{\kappa}}
+%, \boldsymbol{N}=\boldsymbol{\Sigma\tilde{N}}\\
+%\kappa_x&= \mathbb{K}_x q, \kappa_y = \mathbb{K}_y q, \kappa_{xy} = \mathbb{K}_{xy} q
+\end{aligned}
+\label{eqn:nondimstrains}
+\end{eqnarray}
+
+where:
+
+\begin{itemize}
+	\item $2L_x$ and $2L_y$ are the side lengths of the plate along with Cartesian axes,
+	\item $U_d, V_d, W_d$ is defined as : \cite{Pirrera2010}\cite{Lamacchia2015} 
+\end{itemize}
+
+\begin{eqnarray}
+\begin{aligned}
+U_d&= \frac{1}{L_x}\sqrt{A_{11}^\star A_{22}^\star D_{11}^\star D_{22}^\star}\\
+V_d&= \frac{1}{L_y}\sqrt{A_{11}^\star A_{22}^\star D_{11}^\star D_{22}^\star}\\
+W_d&= \sqrt[4]{A_{11}^\star A_{22}^\star D_{11}^\star D_{22}^\star}
+\end{aligned}
+\end{eqnarray}
+\begin{itemize}
+	\item  The planes strains and curvatures can be scaled using $\textbf{E}$ and $\textbf{K}$, as given below: 
+\end{itemize}
+
+\begin{eqnarray}
+\begin{aligned}
+E_{xx}&=&\frac{1}{2}\frac{W_d^2}{L_x^2},
+E_{yy}&=&\frac{1}{2}\frac{W_d^2}{L_y^2},
+E_{xy}&=&\frac{W_d^2}{L_xL_y} \\
+K_{xx}&=&-\frac{W_d^2}{L_x^2},
+K_{yy}&=&-\frac{W_d^2}{L_y^2},
+K_{xy}&=&-2\frac{W_d^2}{L_xL_y} 
+\end{aligned}
+\end{eqnarray}
+%$\Sigma$ is used to scale the in-plane stresses and can be represented as:
+%$\textbf{A}\textbf{E}$.\\
+The thermal inplane-stresses and the moments can be scaled as:
+$\bm{N}^{th}=\bm{\tilde{N}}^{th} \tilde{\tau}$ and $\bm{M}^{th}=\bm{\tilde{M}}^{th} \tilde{\tau}$ 
+
+Legendre polynomial are used to describe the out-of-plane displacements $w$, from which the curvature  fields are calculated. The following definition of $w$ is used:
+
+\begin{eqnarray}
+\begin{aligned}
+\tilde{w}(x.y)= \tilde{w}_0(x.y) +  \sum_{i=0}^{n} \sum_{j=0}^{n} q_{ij}P_i(x)Q_j(y)
+\end{aligned}
+\label{eqn:wdef}
+\end{eqnarray}
+where $\tilde{w}_0$ is the dimensionless out-of-plane displacement at the mid-plane surface and $P_i(x)$ and $Q_j(x)$ are defined as:
+
+\begin{eqnarray}
+\begin{aligned}
+%% plain-TeX syntax
+P_l(\phi)=\sum_{k=0}^{l}\left( {l \atop k} \right)\left( {l-1 \atop k} \right)\left(\dfrac{1-\phi}{2}\right)^k   \quad  \text{and} \quad \phi=x,y
+\label{eqn:wdef}
+\end{aligned}
+\end{eqnarray}
+
+For a order $2n$ polynomial, there comprises $(n+1)^2$ different combinations of shape functions $P_i(x)P_j(x)$ multiplied with $q_{ij}$ unknown parameters.
+With this approximation of out-of-plane displacement $\tilde{w}$, the membrane problem is can re-written in dimensionless form, where the in-plane stresses can be expressed in terms of the unknown coefficients $q_{ij}$ defining $\tilde{w}$. 
+
+\begin{equation}
+\label{eqn:compatnd}
+\frac{1}{2}\frac{\partial^2 \tilde{\varepsilon}_{yy} }{\partial \tilde{x}^2} + \frac{1}{2}\frac{\partial^2 \tilde{\varepsilon}_{xx} }{\partial \tilde{y}^2} -
+\frac{\partial^2\tilde{\gamma}_{xy} }{\partial \tilde{x}  \partial \tilde{y}}=\text{det}\,\tilde{\kappa}= \tilde{\kappa}_{xx}\tilde{\kappa}_{yy} - \tilde{\kappa}_{xy}^2
+\end{equation}
+where the operator $\mathcal{\tilde{L}}_A$ is defined as:
+\begin{equation}
+\label{eqn:Lnd}
+\mathcal{\tilde{L}}_A=\left[\frac{1}{2}\frac{\partial^2 }{\partial \tilde{y}^2},\frac{1}{2}\frac{\partial^2 }{\partial \tilde{x}^2} ,\frac{\partial^2 }{\partial \tilde{x} \tilde{y}}\right]
+\end{equation}
+Eq.\ref{eqn:compat2} can be written in the dimensionless form as:
+\begin{equation}
+\label{eqn:LAN}
+\mathcal{\tilde{L}_A}(\tilde{\bm{N}})=\tilde{\kappa}_{xx}\tilde{\kappa}_{yy} - \tilde{\kappa}_{xy}^2 - \mathcal{\tilde{L}_A}(\tilde{\bm{E}}^{-1}\tilde{\bm{A}}^{-1}\tilde{\bm{N}}^{th}\tilde{\tau}) + \mathcal{\tilde{L}_A}(\tilde{\bm{B}}^\ast\tilde{\bm\kappa)}
+\end{equation}
+%$\tilde{\bm{N}}$
+%\begin{eqnarray}
+%\label{eqn:compat2}
+%\begin{aligned}
+%\text{curl}\text{curl}(\boldsymbol{A}^\ast\boldsymbol{N}) &=\text{det}\boldsymbol\kappa - \text{curl}\text{curl}\left(\boldsymbol{A}^\ast\boldsymbol{N}^{th}+\boldsymbol{B}^\ast\boldsymbol\kappa\right):= g,  \quad  \text{on} \: S
+%\end{aligned}
+%\end{eqnarray}
+
+The in-plane equilibrium equations can be written as:
+
+\begin{eqnarray}
+\label{eqn:LA}
+\begin{aligned}
+\left(\frac{1}{L_x}\mathcal{\tilde{L}}_B(\bm{A}\bm{E}\tilde{\bm{N}}) + \frac{1}{L_y}\mathcal{\tilde{L}}_C(\bm{A}\bm{E}\tilde{\bm{N}})\right)&=0 \quad  \text{on} \: \tilde{S} \in \left[-1,1\right] \\
+\tilde{\bm{N}}. \boldsymbol{n} &= 0 \quad \text{on} \: \partial \tilde{S}
+\end{aligned}
+\end{eqnarray}
+where $\mathcal{\tilde{L}}_B$ and $\mathcal{\tilde{L}}_C$ is defined:
+
+
+\begin{equation}
+\label{eqn:LBLC}
+\mathcal{\tilde{L}}_B=
+\begin{bmatrix}
+\begin{aligned}
+\frac{\partial}{\partial \tilde{x}} \quad  &0 \quad  0 \\ 0 \quad  &0 \quad  \frac{\partial}{\partial \tilde{y}} 
+\end{aligned}
+\end{bmatrix}, \qquad
+\mathcal{\tilde{L}}_C=
+\begin{bmatrix}
+\begin{aligned}
+&0 \quad 0 \quad \frac{\partial}{\partial \tilde{y}} \\ &0 \quad \frac{\partial}{\partial \tilde{y}}\quad 0 
+\end{aligned}
+\end{bmatrix}
+\end{equation}
+In a concise way, both Eq.\ref{eqn:LA} and \ref{eqn:LBLC} can be written as in a single operator $\mathcal{\tilde{L}}$ as:
+\begin{equation}
+\label{eqn:Lop}
+\mathcal{\tilde{L}}=
+\begin{bmatrix}
+\begin{aligned}
+&\mathcal{\tilde{L}}_A
+\\  \left(\frac{1}{L_x}\mathcal{\tilde{L}}_B(\bm{A}\bm{E}) \right. & \left. + \frac{1}{L_y}\mathcal{\tilde{L}}_C(\bm{A}\bm{E})\right)\tilde{\bm{N}}
+\end{aligned}
+\end{bmatrix}
+\end{equation}
+Combining the membrane problem \ref{eqn:LAN} and the equilibrium conditions \ref{eqn:LA}, we get:
+\begin{eqnarray}
+\label{eqn:LA}
+\begin{aligned}
+\mathcal{\tilde{L}}\tilde{\bm{N}}&=\tilde{f} \quad  \text{on} \: \tilde{S} \in \left[-1,1\right] \\
+\tilde{\bm{N}}. \boldsymbol{n} &= 0 \quad \text{on} \: \partial \tilde{S}
+\end{aligned}
+\end{eqnarray}
+where $\tilde{f}$ is equal to:
+\begin{equation}
+\label{eqn:fvecdef}
+\tilde{f}=
+\begin{bmatrix}
+\begin{aligned}
+\tilde{\kappa}_{xx}\tilde{\kappa}_{yy} - \tilde{\kappa}_{xy}^2 - \mathcal{\tilde{L}_A}&(\tilde{\bm{E}}^{-1}\tilde{\bm{A}}^{-1}\tilde{\bm{N}}^{th}\tilde{\tau}) + \mathcal{\tilde{L}_A}(\tilde{\bm{B}}^\ast\tilde{\bm\kappa)}
+\\  &\mathbf{0}
+\end{aligned}
+\end{bmatrix}
+\end{equation}
+
+Consequently, the strain energy in its non-dimensional form comes out to be:
+\begin{equation}
+\label{eqn:totalennd}
+\begin{aligned}
+\tilde{\Pi}= \int_{-1}^{1}\int_{-1}^{1} \left(\frac{1}{2} \tilde{\bm{N}}^T\tilde{\bm{A}}^\ast\tilde{\bm{N}} + \frac{1}{2}\tilde{\bm{\kappa}}^T\tilde{\bm{D}}^\ast\tilde{\bm{\kappa}} - \frac{1}{2}\tilde{\tau}\tilde{\bm{A}}^{th}\tilde{\tau} - \tilde{\tau}\tilde{\bm{B}}^{th}\tilde{\bm{\kappa}} - \tilde{\tau}\tilde{\bm{D}}^{th}\tilde{\bm{\kappa}}\right)d\tilde{x}d\tilde{y}
+\end{aligned}
+\end{equation}
+
+
+%\begin{equation}
+%\begin{aligned}
+%\tilde{U}= \int_{-1}^{1}\int_{-1}^{1} \left(\frac{1}{2} \tilde{\bm{N}}^T\tilde{\bm{A}}^\ast\tilde{\bm{N}} + \frac{1}{2}\tilde{\bm{\kappa}}^T\tilde{\bm{D}}^\ast\tilde{\bm{\kappa}} - \frac{1}{2}\tilde{\tau}\tilde{\bm{A}}^{th}\tilde{\tau}
+%\right)d\tilde{x}d\tilde{y}
+%\end{aligned}
+%\end{equation}
+
+
+where the non-dimensional material parameters are defined as:
+\begin{equation}
+\begin{aligned}
+\tilde{\bm{A}}^\ast &= \frac{L_x L_y}{\Pi_d}\bm{E}^T\bm{A}^\ast\bm{E} ,\,  \quad 
+\tilde{\bm{B}}^\ast  									=\tilde{\bm{E}}^{-1}\tilde{\bm{A}}^{-1}\tilde{\bm{N}}^{th}\tilde{\tau}\bm{B}\bm{K}
+,\,\quad   
+\tilde{\bm{D}}^\ast = \frac{L_x L_y}{\Pi_d}\bm{K}^T\tilde{\bm{D}}^\ast\bm{K}  \\  
+\tilde{\bm{A}}^{th} &= \frac{L_x L_y}{\Pi_d}\left(\tilde{\bm{N}}^{th}\right)^T\bm{A}^\ast   \tilde{\bm{N}}^{th} ,\,    \quad 
+\tilde{\bm{A}}^{th} = \frac{L_x L_y}{\Pi_d}\left(\tilde{\bm{N}}^{th}\right)^T\bm{B}^\ast   {\bm{K}} ,\,    \quad 
+\tilde{\bm{D}}^{th} = \frac{L_x L_y}{\Pi_d}\left(\tilde{\bm{M}}^{th}\right)^T\bm{K}  
+% 
+% 
+% \tilde{U}= \int_{-1}^{1}\int_{-1}^{1} \left(\frac{1}{2} \tilde{\bm{N}}^T\tilde{\bm{A}}^\ast\tilde{\bm{N}} + \frac{1}{2}\tilde{\bm{\kappa}}^T\tilde{\bm{D}}^\ast\tilde{\bm{\kappa}} - \frac{1}{2}\tilde{\tau}\tilde{\bm{A}}^\ast\tilde{\tau} - \tilde{\tau}\tilde{\bm{B}}^{th}\tilde{\bm{\kappa}} - \tilde{\tau}\tilde{\bm{D}}^{th}\tilde{\bm{\kappa}}\right)d{\tilde{x}}d{\tilde{y}}
+%
+%
+%\left[\boldsymbol N^T\boldsymbol A^\ast(x,y)\boldsymbol N\right]d\bar{S} +   & \frac{1}{2}\int_{S}\left[\boldsymbol\kappa^T\boldsymbol D^\ast(x,y)\kappa\varepsilon\right]d\bar{S} - \frac{1}{2}\int_{S}\left[(\boldsymbol {N}^{th})^T\boldsymbol A^\ast(x,y)\boldsymbol N^{th}\right]d\bar{S}  \\ & -  \int_{S}\left[(\boldsymbol {N}^{th})^T\boldsymbol B^\ast(x,y)\boldsymbol \kappa \right]d\bar{S}- \int_{S}\left[(\boldsymbol {M}^{th})^T\boldsymbol I\boldsymbol \kappa \right]d\bar{S}
+\end{aligned}
+\end{equation}
+and 
+\begin{equation}
+\Pi_d=\mathrm{tr}\left(\begin{bmatrix}
+\mathbf{E} \quad \mathbf{0} \\\mathbf{0} \quad \mathbf{K}
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{A} \quad \mathbf{B} \\\mathbf{B} \quad \mathbf{D}
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{E} \quad \mathbf{0} \\\mathbf{0} \quad \mathbf{K}
+\end{bmatrix}
+\right)  
+\end{equation}
+is a parameter used to scale the total strain energy (\cite{Pirrera2010}).
+The thermal stress resultants $\tilde{\bm{N}}^{th}$ and the moment results $\tilde{\bm{M}}^{th}$, which contributes to the total strain energy can be written as:
+\begin{equation}
+\begin{aligned}
+\tilde{\bm{N}}^{th}&=\sum_{k=1}^{n_{ply}}\int_{z_k}^{z_{k+1}}\tilde{\bm{Q}}_k\left(T\right)\tilde{\bm{\alpha}}_k\left(T\right) \Delta T_0 dz \\
+\tilde{\bm{M}}^{th}&=\sum_{k=1}^{n_{ply}}\int_{z_k}^{z_{k+1}}\tilde{\bm{Q}}_k\left(T\right)\tilde{\bm{\alpha}}_k\left(T\right) \Delta T_0 zdz
+\end{aligned}
+\end{equation}
+
+where the non-dimensional thermal stress and moment resultants is scaled as: $\bm{N}^{th}=\tilde{\bm{N}}^{th}\tilde{\tau}$ and    $\bm{M}^{th}=\tilde{\bm{M}}^{th}\tilde{\tau}$.
+\subsection{Snap-through}
+To calculate the snap-through, the contribution of the external forces must also be added in the virtual work equation as:
+\begin{equation}
+\begin{aligned}
+\label{virtualwork1}
+\delta V= F_z.\delta( w -w_0)W_D
+\end{aligned}
+\end{equation}
+where $w_0$ is the out-of-plane displacement at the center of the plate.
+$W_0$ is used scale from non-dimensional form to dimensional form, which can be written as:
+$W_d= \sqrt[4]{A_{11}^\star A_{22}^\star D_{11}^\star D_{22}^\star}$. \\
+Accordingly, the modified virtual work principle with the external force contribution $V$ and internal strain energy $U$ can be written as follows:
+
+\begin{equation}
+\label{virtualwork3}
+\delta W_{T}= \frac{\Pi_d}{LxLy}\delta\tilde{\Pi} - \delta V=0 
+\end{equation}
+where the $W_T$ is the actual total energy ( without non-dimensionalization), and $U0$ is the scale energy
+The unknowns of the displacements field could be now easily found using Rayleigh Ritz method. At $\delta V=0$, the local minimizers of the total energy will give the stable equilibrium shapes. 
+
+
+\begin{equation}
+\label{virtualwork4}
+\frac{\partial W_{T}(q_{ij})}{\partial q_{ij}} =0 
+\end{equation}
+
+\begin{equation}
+\label{virtualwork5}
+\frac{W_0}{LxLy}\frac{\partial \Pi(q_{ij})}{\partial q_{ij}} - \frac{\partial V(q_{ij})}{\partial q_{ij}}   =0 
+\end{equation}
+
+%
+%\begin{equation}
+%\label{virtualwork5}
+%\begin{aligned}
+%\left(\frac{\partial \Pi_{N}}{\partial c_9} - \frac{L^2}{8}F_z \right)\delta c_9  &+ \left(\frac{\partial \Pi_{N}}{\partial c_{10}} - \frac{L^2}{8}F_z \right)\delta c_{10}  + \left(\frac{\partial \Pi_{N}}{\partial c_{11}} - \frac{L^2}{8}F_z  \right)\delta c_{11} \\ &+ \cdots \cdots \frac{\partial \Pi_{N}}{\partial c_i}\delta c_i = 0
+%\end{aligned}
+%\end{equation}
+
+This results in a set of highly non-linear system of equations (Eq. \eqref{virtualwork4}) which are solved using the Newton-Raphson technique. Finally, the stability of the solution is evaluated by means of the construction of the Jacobian matrix $\textbf{J}$, that reads:
+
+\begin{equation}
+\label{Jacobian}
+\textbf{J} = \frac{\partial^{2} W_{T} }{\partial q_{ij} \partial c_{kl}}, \;\text{i,j,k,l=0, ..., n }
+\end{equation}
+where $n$ is the order of the Legendre polynomial.
+
+An equilibrium configuration is stable, if and only if the corresponding Jacobian matrix Eq. \eqref{Jacobian} is positive definite. All the symbolic computation described were accomplished using the routines written in \textsl{Mathematica}.
+
+The two stable shapes obtained after the cool down process can be first obtained by setting the value of the applied force to zero. To calculate the snap-through forces, the load terms in Eq. \ref{virtualwork1} is gradually increased until the system converges to only one solution. Assessing the Hessian of the solution indicates if the solution is stable or not.
+
+
+\section{DQM formulation}
+\subsection{Differential Quadrature Method}
+Differential quadrature method presented by \cite{Shu} is a robust numerical technique whose details can be found in.....
+In this method, the derivatives of a function at a spatial point is approximated as  weighted grid points in the entire domain of the variable. The partial derivatives of a function $f(x)$ in matrix form can be written as:
+
+\begin{equation}
+\begin{aligned}
+\frac{\partial f}{\partial x} &= {P}_xf, \frac{\partial f}{\partial y} = f{P}_y^T , \frac{\partial^2 f}{\partial x \partial y} = {P}_x f{P}_y^T \\
+\frac{\partial^2 f}{\partial^2 x} &= {Q}_xf, \frac{\partial^2 f}{\partial^2 y} =f {Q}_y^T, \frac{\partial^4 f}{\partial^2 x \partial^2 y} = {Q}_x f{Q}_y^T \\
+\kappa_x &= \mathbb{K}_x q, \kappa_y = \mathbb{K}_y q, \kappa_{xy} = \mathbb{K}_{xy} q
+\end{aligned}
+\end{equation}
+where $P$,$Q$ are the DQM coefficients for the first and second order partial derivatives with respect to $x$ and $y$.
+
+Eq.\ref{eqn:compat} can be written in the non-dimensional form as:
+\begin{equation}
+\label{eqn:compat2}
+\frac{1}{2}\frac{\partial^2 \tilde{\varepsilon}_{yy} }{\partial \tilde{x}^2} + \frac{1}{2}\frac{\partial^2 \tilde{\varepsilon}_{xx} }{\partial \tilde{y}^2} -
+\frac{\partial^2\tilde{\varepsilon}_{xy} }{\partial \tilde{x}  \partial \tilde{y}}=\text{det}\,\tilde{\kappa}= \tilde{\kappa}_{xx}\tilde{\kappa}_{yy} - \tilde{\kappa}_{xy}^2:=f
+\end{equation}
+Eq.\label{eqn:compat2} can be written in the non-dimensional form as:
+
+%\begin{equation}
+%\begin{align}
+%f=
+%  \begin{minipage}[t]{.7\displaywidth}
+%  \raggedright\linespread{1.2}\selectfont
+%  \begin{math}
+%\frac{1}{2}(\tilde{B}^{*}_{11}\tilde{k}_{xx,yy} + \tilde{B}^{*}_{12}\tilde{k}_{yy,yy} + \tilde{B}^{*}_{13}\tilde{k}_{xy,yy} + 
+%\tilde{k}_{xx}\tilde{B}^{*}_{11,yy} +\tilde{k}_{yy}\tilde{B}^{*}_{12,yy} + \tilde{k}_{xy}\tilde{B}^{*}_{13,yy}
+%+ 2\tilde{B}^{*}_{11,y}\tilde{k}_{xx,y} + 2\tilde{B}^{*}_{12,y}\tilde{k}_{yy,y} + 2\tilde{B}^{*}_{13,y}\tilde{k}_{xy,y} + 
+%\tilde{B}^{*}_{21}\tilde{k}_{xx,xx} + \tilde{B}^{*}_{22}\tilde{k}_{yy,xx} + \tilde{B}^{*}_{23}\tilde{k}_{xy,xx} + \tilde{k}_{xx}\tilde{B}^{*}_{21,xx} + \tilde{k}_{yy}\tilde{B}^{*}_{22,xx} +  \tilde{k}_{xy}\tilde{B}^{*}_{23,xx} + 2\tilde{B}^{*}_{21,x}\tilde{k}_{xx,x} + 2\tilde{B}^{*}_{22,x}\tilde{k}_{yy,x} + 2\tilde{B}^{*}_{23,x}\tilde{k}_{xy,x})- (\tilde{B}^{*}_{31}\tilde{k}_{xx,xy} +  B^{*}_{32}\tilde{k}_{yy,xy} + \tilde{B}^{*}_{33}\tilde{k}_{xy,xy} + \tilde{k}_{xx}\tilde{B}^{*}_{31,xy} + \tilde{k}_{yy}\tilde{B}^{*}_{32,xy} + \tilde{k}_{xy}\tilde{B}^{*}_{33,xy}
+%+ \tilde{k}_{xx,y}\tilde{B}^{*}_{31,x}
+%+ \tilde{k}_{xx,y}\tilde{B}^{*}_{32,x}
+%+ \tilde{k}_{xy,y}\tilde{B}^{*}_{33,x}
+%+ \tilde{B}^{*}_{31,y}\tilde{k}_{xx,x}
+%+ \tilde{B}^{*}_{32,y}\tilde{k}_{yy,x}
+%+ \tilde{B}^{*}_{33,y}\tilde{k}_{xy,x}) - \frac{1}{2} (\Sigma^{-1}_{11}\Sigma_{N_{xx},yy} + \Sigma^{-1}_{12}\Sigma_{N_{yy},yy} + \Sigma^{-1}_{13}\Sigma_{N_{xy},yy} + \Sigma^{-1}_{21}\Sigma_{N_{xx},xx} +  \Sigma^{-1}_{22}\Sigma_{N_{yy},xx} + \Sigma^{-1}_{23}\Sigma_{N_{xy},xx}) + (\Sigma^{-1}_{31}\Sigma_{N_{xx},xy} + \Sigma^{-1}_{32}\Sigma_{N_{yy},xy} + \Sigma^{-1}_{33}\Sigma_{N_{xy},xy})
+%\end{math}
+%  \end{minipage}
+%\end{align}
+%\end{equation}
+
+
+
+\begin{align}
+f={}&
+\frac{1}{2}(\tilde{B}^{*}_{11}\tilde{k}_{xx,yy} + \tilde{B}^{*}_{12}\tilde{k}_{yy,yy} + \tilde{B}^{*}_{13}\tilde{k}_{xy,yy} + \tilde{k}_{xx}\tilde{B}^{*}_{11,yy} +\tilde{k}_{yy}\tilde{B}^{*}_{12,yy} \notag\\
+& + \tilde{k}_{xy}\tilde{B}^{*}_{13,yy} + 2\tilde{B}^{*}_{11,y}\tilde{k}_{xx,y} + 2\tilde{B}^{*}_{12,y}\tilde{k}_{yy,y} + 2\tilde{B}^{*}_{13,y}\tilde{k}_{xy,y} + 
+\tilde{B}^{*}_{21}\tilde{k}_{xx,xx} \notag\\
+&+ \tilde{B}^{*}_{22}\tilde{k}_{yy,xx} + \tilde{B}^{*}_{23}\tilde{k}_{xy,xx} + \tilde{k}_{xx}\tilde{B}^{*}_{21,xx} + \tilde{k}_{yy}\tilde{B}^{*}_{22,xx} +  \tilde{k}_{xy}\tilde{B}^{*}_{23,xx}\notag\\
+&+ 2\tilde{B}^{*}_{21,x}\tilde{k}_{xx,x} + 2\tilde{B}^{*}_{22,x}\tilde{k}_{yy,x} + 2\tilde{B}^{*}_{23,x}\tilde{k}_{xy,x})- (\tilde{B}^{*}_{31}\tilde{k}_{xx,xy} +  B^{*}_{32}\tilde{k}_{yy,xy}\notag\\
+&+ \tilde{B}^{*}_{33}\tilde{k}_{xy,xy} + \tilde{k}_{xx}\tilde{B}^{*}_{31,xy} + \tilde{k}_{yy}\tilde{B}^{*}_{32,xy} + \tilde{k}_{xy}\tilde{B}^{*}_{33,xy}
++  \tilde{k}_{xx,y}\tilde{B}^{*}_{31,x} \notag\\ &+ \tilde{k}_{xx,y}\tilde{B}^{*}_{32,x} + \tilde{k}_{xy,y}\tilde{B}^{*}_{33,x} + \tilde{B}^{*}_{31,y}\tilde{k}_{xx,x} + \tilde{B}^{*}_{32,y}\tilde{k}_{yy,x}
++ \tilde{B}^{*}_{33,y}\tilde{k}_{xy,x})\notag\\&- \frac{1}{2} (\Sigma^{-1}_{11}\Sigma_{N_{xx},yy} + \Sigma^{-1}_{12}\Sigma_{N_{yy},yy} + \Sigma^{-1}_{13}\Sigma_{N_{xy},yy} + \Sigma^{-1}_{21}\Sigma_{N_{xx},xx} \notag\\
+&+  \Sigma^{-1}_{22}\Sigma_{N_{yy},xx} + \Sigma^{-1}_{23}\Sigma_{N_{xy},xx}) + (\Sigma^{-1}_{31}\Sigma_{N_{xx},xy}+ \Sigma^{-1}_{32}\Sigma_{N_{yy},xy} + \Sigma^{-1}_{33}\Sigma_{N_{xy},xy})
+\label{eq:frhs}
+\end{align}
+
+
+%\begin{equation}
+%\begin{aligned}
+%f = \kappa_x \kappa_y - \kappa_{xy}^2 + \frac{1}{2}\left(B^{*}_{11}\kappa_{xx,yy} + B^{*}_{12}\kappa_{yy,yy} + B^{*}_{13}\kappa_{xy,yy} + \kappa_{xx}B^{*}_{11,yy}+ \kappa_{yy}B^{*}_{12,yy} +  \kappa_{xy}B^{*}_{13,yy} + B^{*}_{21}\kappa_{xx,xx} + B^{*}_{22}\kappa_{yy,xx} + B^{*}_{23}\kappa_{xy,xx} + \kappa_{xx}B^{*}_{21,xx} + \kappa_{yy}B^{*}_{22,xx} +  \kappa_{xy}B^{*}_{23,xx}\right)- 2(B^{*}_{31}\kappa_{xx,xy} +  B^{*}_{32}\kappa_{yy,xy}  + B^{*}_{33}\kappa_{xy,xy} + \kappa_{xx}B^{*}_{31,xy} + \kappa_{yy}B^{*}_{32,xy}  +  \Sigma^{-1}_{13}\Sigma_{N3,yy} + \Sigma^{-1}_{21}\Sigma_{N1,xx} +  \Sigma^{-1}_{22}\Sigma_{N2,xx} + \Sigma^{-1}_{23}\Sigma_{N3,xx}) + 2(\Sigma^{-1}_{31}\Sigma_{N1,xy} + \Sigma^{-1}_{32}\Sigma_{N2,xy} + \Sigma^{-1}_{33}\Sigma_{N3,xy})
+%\end{aligned}
+%\end{equation}
+
+\begin{align}
+f={}&  
+\kappa_x \kappa_y - \kappa_{xy}^2  + \frac{1}{2}\left(B^{\ast}_{11}\kappa_{xx,yy} + B^{*}_{12}\kappa_{yy,yy} + B^{*}_{13}\kappa_{xy,yy}+ \kappa_{xx}B^{*}_{11,yy}\right. \notag\\ 
+&+ \left. \kappa_{yy}B^{*}_{12,yy} +  \kappa_{xy}B^{*}_{13,yy} +  B^{*}_{21}\kappa_{xx,xx} + B^{*}_{22}\kappa_{yy,xx} + B^{*}_{23}\kappa_{xy,xx} \right. \notag\\ 
+&+ \left. \kappa_{xx}B^{*}_{21,xx} + \kappa_{yy}B^{*}_{22,xx} +  \kappa_{xy}B^{*}_{23,xx}\right) - \left(B^{*}_{31}\kappa_{xx,xy}  +  B^{*}_{32}\kappa_{yy,xy} \right. \notag\\ 
+&+ \left.  B^{*}_{33}\kappa_{xy,xy} + \kappa_{xx}B^{*}_{31,xy} + \kappa_{yy}B^{*}_{32,xy}  + \kappa_{xy}B^{*}_{33,xy}\right)
++ \left(B^{\ast}_{11,y}\kappa_{xx,y} \right. \notag\\ 
+&+ \left. B^{\ast}_{12,y}\kappa_{yy,y} + B^{\ast}_{13,y}\kappa_{xy,y} + B^{\ast}_{21,x}\kappa_{xx,x} +  B^{\ast}_{22,x}\kappa_{yy,x} + B^{\ast}_{23,x}\kappa_{xy,x} \right. \notag\\ 
+&- \left. B^{\ast}_{31,x}\kappa_{xx,y} - B^{\ast}_{32,x}\kappa_{yy,y} - B^{\ast}_{33,x}\kappa_{xy,y} - B^{\ast}_{31,y}\kappa_{xx,x} - B^{\ast}_{32,y}\kappa_{yy,x} \right. \notag\\ 
+&- \left. B^{\ast}_{33,y}\kappa_{xy,x}\right)- \frac{1}{2}\left(\Gamma_{11}\tilde{N}^{th}_{xx,yy} + \Gamma_{12}\tilde{N}^{th}_{yy,yy} + \Gamma_{13}\tilde{N}^{th}_{xy,yy} + \tilde{N}^{th}_{xx}\Gamma_{11,yy}\right. \notag\\ &+ \left. \tilde{N}^{th}_{yy}\Gamma_{12,yy} + \tilde{N}^{th}_{xy}\Gamma_{13,yy} +  \Gamma_{21}\tilde{N}^{th}_{xx,xx} +\Gamma_{22}\tilde{N}^{th}_{yy,xx} + \Gamma_{23}\tilde{N}^{th}_{xy,xx} \right. \notag\\ 
+&+ \left.\tilde{N}^{th}_{xx}\Gamma_{21,xx} + \tilde{N}^{th}_{yy}\Gamma_{22,xx} +  \tilde{N}^{th}_{xy}\Gamma_{23,xx}\right) + \left(\Gamma_{31}\tilde{N}^{th}_{xx,xy} + \Gamma_{32}\tilde{N}^{th}_{yy,xy}  \right. \notag\\ 
+&+ \left. \Gamma_{33}\tilde{N}^{th}_{xy,xy} + \tilde{N}^{th}_{xx}\Gamma_{31,xy} + \tilde{N}^{th}_{yy}\Gamma_{32,xy} \right)
+- \left(\Gamma_{11,y}\tilde{N}^{th}_{xx,y} + \Gamma_{12,y}\tilde{N}^{th}_{yy,y} \right. \notag\\ 
+&+ \left. \Gamma_{13,y}\tilde{N}^{th}_{xy,y} +\Gamma_{21,x}\tilde{N}^{th}_{xx,x} +  \Gamma_{22,x}\tilde{N}^{th}_{yy,x} + \Gamma_{23,x}\tilde{N}^{th}_{xy,x} -\Gamma_{31,x}\tilde{N}^{th}_{xx,y} \right. \notag\\ 
+&- \left. \Gamma_{32,x}\tilde{N}^{th}_{yy,y} - \Gamma_{33,x}\tilde{N}^{th}_{xy,y} - \Gamma_{31,y}\tilde{N}^{th}_{xx,x} - \Gamma_{32,y}\tilde{N}^{th}_{yy,x} - \Gamma_{33,y}\tilde{N}^{th}_{xy,x}\right) \notag\\ 
+%%\Sigma^{-1}_{13}\Sigma_{N3,yy} + \Sigma^{-1}_{21}\Sigma_{N1,xx} +  \Sigma^{-1}_{22}\Sigma_{N2,xx} + \\ & \Sigma^{-1}_{23}\Sigma_{N3,xx}) +  2(\Sigma^{-1}_{31}\Sigma_{N1,xy} + \Sigma^{-1}_{32}\Sigma_{N2,xy} + \Sigma^{-1}_{33}\Sigma_{N3,xy})
+\end{align}
+
+where $\bm{\Gamma}= \left(\bm{A}\bm{E}\right)^{-1}$.\\
+
+
+Eqn.\ref{eqn:fvec} is a fourth order elliptic partial differential equation in terms of the out-of-plane displacement $w$, which are expressed in terms of the curvatures. It also represents the additional degrees of freedom of VS laminates with comparison to straight fiber laminates. On the basis of the combination of the unknown coefficients $q_{ij}$ could be simply separated in three different components $f_1$, $f_2$ and $f_3$, in the following way:
+\begin{equation}
+f=\mathbf{F_1}\vec{q} \otimes \vec{q} + \mathbf{F_2}\vec{q} + \mathbf{F_3}
+\end{equation}
+%where
+%\begin{dmath}
+%f_{11}= \textbf{K}_x \otimes \textbf{K}_y -\textbf{K}_{xy} \otimes \textbf{K}_{xy} 
+%\end{dmath}
+Such separation of the variable combination can allow one to avoid symbolic calculations and lead to much faster computations. 
+To systemically depict Eq. \ref{eqn:fvec} as DQM representation, vectorization is performed on all the matrix components. If $\bm{A}$, $\bm{B}$, $\bm{X}$ and $\bm{C}$ are the given matrices, the equation $\bm{A}\bm{X}\bm{B}=\bm{C}$ can be written as $\left(\bm{B}^T\otimes\bm{A}\right)X=C$. 
+To convert $\mathbf{F_1}$, $\mathbf{F_2}$ and $\mathbf{F_3}$ into the vectorized form, the Kronecker and the Hadamard products are applied to Eq. \ref{eqn:fvec}, and can be written in the following way:
+
+\begin{equation}
+\mathbf{F_1}=(\mathbb{K}_x \otimes \mathbb{K}_y -\mathbb{K}_{xy} \otimes \mathbb{K}_{xy})
+\end{equation}
+
+%\begin{quote}\raggedright
+%	$\mathbf{F_2}=\frac{1}{2}\left( \left(\vec{B}^{\,*}_{11}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes {Q}_y \right)\mathbb{K}_x + \left(\vec{B}^{\,*}_{12}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes {Q}_y\right)\mathbb{K}_y  + \left(\vec{B}^{\,*}_{13}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes {Q}_y\right)\mathbb{K}_{xy}
+%	+ \left(\vec{B}^{\,*}_{11,yy}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes \mathbb{K}_x\right) + \left(\vec{B}^{\,*}_{12,yy}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes \mathbb{K}_y\right)  +  \left(\vec{B}^{\,*}_{13,yy}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes \mathbb{K}_{xy}\right)
+%	+ \left(\vec{B}^{\,*}_{21}\otimes\vec{J}\right)\circ
+%	\left( {Q}_x\otimes I_x \right)\mathbb{K}_x + \left(\vec{B}^{\,*}_{22}\otimes\vec{J}\right)\circ
+%	\left( {Q}_x\otimes I_x \right)\mathbb{K}_y + \left(\vec{B}^{\,*}_{23}\otimes\vec{J}\right)\circ
+%	\left( {Q}_x\otimes I_x \right)\mathbb{K}_{xy} + \left(\vec{B}^{\,*}_{21,xx}\otimes\vec{J}\right)\circ
+%	\left(\mathbb{K}_x\otimes I_x \right) + \left(\vec{B}^{\,*}_{22,xx}\otimes\vec{J}\right)\circ
+%	\left(\mathbb{K}_y\otimes I_x \right) +  \left(\vec{B}^{\,*}_{23,xx}\otimes\vec{J}\right)\circ
+%	\left(\mathbb{K}_{xy}\otimes I_x \right) 
+%	\right)+\left(\left(\vec{B}^{\,*}_{11,y}\otimes\vec{J}\right) \circ\left(I_y\otimes  {P}_y \right)\mathbb{K}_x
+%	+ \left(\vec{B}^{\,*}_{12,y}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes  {P}_y \right)\mathbb{K}_y 
+%	+ \left(\vec{B}^{\,*}_{13,y}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes  {P}_y \right)\mathbb{K}_{xy} +  \left(\vec{B}^{\,*}_{21,x}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes  {P}_x \right)\mathbb{K}_x
+%	+ \left(\vec{B}^{\,*}_{22,x}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes  {P}_x \right)\mathbb{K}_y 
+%	+ \left(\vec{B}^{\,*}_{23,y}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes  {P}_x \right)\mathbb{K}_{xy}\right)
+%	-\left( \left(\vec{B}^{\,*}_{31}\otimes\vec{J}\right)\circ
+%	\left( {P}_x\otimes {P}_y \right)\mathbb{K}_x + \left(\vec{B}^{\,*}_{32}\otimes\vec{J}\right)\circ
+%	\left( {P}_x\otimes {P}_y \right)\mathbb{K}_y + \left(\vec{B}^{\,*}_{33}\otimes\vec{J}\right)\circ
+%	\left( {P}_x\otimes {P}_y \right)\mathbb{K}_{xy} + \left(\vec{B}^{\,*}_{31,xy}\otimes\vec{J}\right)\circ
+%	\left({K}_x\otimes I_x \right) + \left(\vec{B}^{\,*}_{32,xy}\otimes\vec{J}\right)\circ
+%	\left(\mathbb{K}_y\otimes I_x \right)+ \left(\vec{B}^{\,*}_{33,xy}\otimes\vec{J}\right)\circ
+%	\left({K}_{xy}\otimes I_x \right) 
+%	+  \left(\vec{B}^{\,*}_{31,x}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes  {P}_y \right)\mathbb{K}_x
+%	+ \left(\vec{B}^{\,*}_{32,x}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes  {P}_y \right)\mathbb{K}_y 
+%	+ \left(\vec{B}^{\,*}_{33,x}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes  {P}_y \right)\mathbb{K}_{xy} 
+%	+  \left(\vec{B}^{\,*}_{31,y}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes  {P}_x \right)\mathbb{K}_x
+%	+ \left(\vec{B}^{\,*}_{32,y}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes  {P}_x \right)\mathbb{K}_y 
+%	+ \left(\vec{B}^{\,*}_{33,y}\otimes\vec{J}\right)\circ
+%	\left(I_y\otimes  {P}_x \right)\mathbb{K}_{xy} \right)$
+%\end{quote}
+
+
+\begin{align}
+	\mathbf{F_2}={}&\frac{1}{2}\left(\left(\vec{B}^{\,*}_{11}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes {Q}_y \right)\mathbb{K}_x + \left(\vec{B}^{\,*}_{12}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes {Q}_y\right)\mathbb{K}_y  \right. \notag\\ 
+	&+ \left. \left(\vec{B}^{\,*}_{13}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes {Q}_y\right)\mathbb{K}_{xy}
+	+ \left(\vec{B}^{\,*}_{11,yy}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes \mathbb{K}_x\right) \right. \notag\\ 
+	&+ \left. \left(\vec{B}^{\,*}_{12,yy}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes \mathbb{K}_y\right)  +  \left(\vec{B}^{\,*}_{13,yy}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes \mathbb{K}_{xy}\right)
+	\right. \notag\\ &+ \left. \left(\vec{B}^{\,*}_{21}\otimes\vec{J}\right)\circ
+	\left( {Q}_x\otimes I_x \right)\mathbb{K}_x + \left(\vec{B}^{\,*}_{22}\otimes\vec{J}\right)\circ
+	\left( {Q}_x\otimes I_x \right)\mathbb{K}_y 	\right. \notag\\ &+ \left.  \left(\vec{B}^{\,*}_{23}\otimes\vec{J}\right)\circ
+	\left( {Q}_x\otimes I_x \right)\mathbb{K}_{xy} + \left(\vec{B}^{\,*}_{21,xx}\otimes\vec{J}\right)\circ
+	\left(\mathbb{K}_x\otimes I_x \right) 	\right. \notag\\ &+ \left. \left(\vec{B}^{\,*}_{22,xx}\otimes\vec{J}\right)\circ
+	\left(\mathbb{K}_y\otimes I_x \right) +  \left(\vec{B}^{\,*}_{23,xx}\otimes\vec{J}\right)\circ
+	\left(\mathbb{K}_{xy}\otimes I_x \right) 
+	\right)	 \notag\\ &+ \left(\left(\vec{B}^{\,*}_{11,y}\otimes\vec{J}\right) \circ\left(I_y\otimes  {P}_y \right)\mathbb{K}_x
+	+ \left(\vec{B}^{\,*}_{12,y}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes  {P}_y \right)\mathbb{K}_y 
+		\right. \notag\\ &+ \left. \left(\vec{B}^{\,*}_{13,y}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes  {P}_y \right)\mathbb{K}_{xy} +  \left(\vec{B}^{\,*}_{21,x}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes  {P}_x \right)\mathbb{K}_x
+		\right. \notag\\ &+ \left. \left(\vec{B}^{\,*}_{22,x}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes  {P}_x \right)\mathbb{K}_y 
+	+ \left(\vec{B}^{\,*}_{23,y}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes  {P}_x \right)\mathbb{K}_{xy}\right)
+	 \notag\\ &-\left( \left(\vec{B}^{\,*}_{31}\otimes\vec{J}\right)\circ
+	\left( {P}_x\otimes {P}_y \right)\mathbb{K}_x + \left(\vec{B}^{\,*}_{32}\otimes\vec{J}\right)\circ
+	\left( {P}_x\otimes {P}_y \right)\mathbb{K}_y 	\right. \notag\\ &+ \left. \left(\vec{B}^{\,*}_{33}\otimes\vec{J}\right)\circ
+	\left( {P}_x\otimes {P}_y \right)\mathbb{K}_{xy} + \left(\vec{B}^{\,*}_{31,xy}\otimes\vec{J}\right)\circ
+	\left({K}_x\otimes I_x \right) 	\right. \notag\\ &+ \left. \left(\vec{B}^{\,*}_{32,xy}\otimes\vec{J}\right)\circ
+	\left(\mathbb{K}_y\otimes I_x \right)+ \left(\vec{B}^{\,*}_{33,xy}\otimes\vec{J}\right)\circ
+	\left({K}_{xy}\otimes I_x \right) 
+		\right. \notag\\ &+ \left. \left(\vec{B}^{\,*}_{31,x}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes  {P}_y \right)\mathbb{K}_x
+	+ \left(\vec{B}^{\,*}_{32,x}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes  {P}_y \right)\mathbb{K}_y 
+		\right. \notag\\ &+ \left. \left(\vec{B}^{\,*}_{33,x}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes  {P}_y \right)\mathbb{K}_{xy} 
+	+  \left(\vec{B}^{\,*}_{31,y}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes  {P}_x \right)\mathbb{K}_x
+		\right. \notag\\ &+ \left. \left(\vec{B}^{\,*}_{32,y}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes  {P}_x \right)\mathbb{K}_y 
+	+ \left(\vec{B}^{\,*}_{33,y}\otimes\vec{J}\right)\circ
+	\left(I_y\otimes  {P}_x \right)\mathbb{K}_{xy} \right)
+\end{align}
+
+
+
+%
+%
+%\begin{equation}
+%f_{12}= \frac{1}{2}\left(\left(\vec{B}^{\,*}_{11}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{Q}_y \right)\textbf{K}_x\vec{q} + \left(\vec{B}^{\,*}_{12}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{Q}_y\right)\textbf{K}_y\vec{q}  + \left(\vec{B}^{\,*}_{13}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{Q}_y\right)\textbf{K}_{xy}\vec{q}
+%+ \left(\vec{B}^{\,*}_{11,yy}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{K}_x\right)\vec{q} + \left(\vec{B}^{\,*}_{12,yy}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{K}_y\right)\vec{q}  +  \left(\vec{B}^{\,*}_{13,yy}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{K}_{xy}\right)\vec{q} + \left(\vec{B}^{\,*}_{21}\otimes\vec{J}\right)\circ
+%\left( \textbf{Q}_x\otimes I_x \right)\textbf{K}_x\vec{q} + \left(\vec{B}^{\,*}_{22}\otimes\vec{J}\right)\circ
+%\left( \textbf{Q}_x\otimes I_x \right)\textbf{K}_y\vec{q} + \left(\vec{B}^{\,*}_{23}\otimes\vec{J}\right)\circ
+%\left( \textbf{Q}_x\otimes I_x \right)\textbf{K}_{xy}\vec{q} + \left(\vec{B}^{\,*}_{21,xx}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_x\otimes I_x \right)\vec{q} + \left(\vec{B}^{\,*}_{22,xx}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_y\otimes I_x \right)\vec{q} +  \left(\vec{B}^{\,*}_{23,xx}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_{xy}\otimes I_x \right)\vec{q} \right) -2\left( \left(\vec{B}^{\,*}_{31}\otimes\vec{J}\right)\circ
+%\left( \textbf{P}_x\otimes\textbf{P}_y \right)\textbf{K}_x\vec{q}  + \left(\vec{B}^{\,*}_{32}\otimes\vec{J}\right)\circ
+%\left( \textbf{P}_x\otimes\textbf{P}_y \right)\textbf{K}_y\vec{q} + \left(\vec{B}^{\,*}_{33}\otimes\vec{J}\right)\circ
+%\left( \textbf{P}_x\otimes\textbf{P}_y \right)\textbf{K}_{xy}\vec{q} + \left(\vec{B}^{\,*}_{31,xy}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_x\otimes I_x \right)\vec{q} + \left(\vec{B}^{\,*}_{32,xy}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_y\otimes I_x \right)\vec{q}+ \left(\vec{B}^{\,*}_{31,xy}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_{xy}\otimes I_x \right)\vec{q} \right)
+%\end{equation}
+
+
+%\begin{equation}
+%f_{12}= \frac{1}{2}\left( \left(\vec{B}^{\,*}_{11}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{Q}_y \right)\textbf{K}_x + \left(\vec{B}^{\,*}_{12}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{Q}_y\right)\textbf{K}_y  + \left(\vec{B}^{\,*}_{13}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{Q}_y\right)\textbf{K}_{xy}
+%+ \left(\vec{B}^{\,*}_{11,yy}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{K}_x\right) + \left(\vec{B}^{\,*}_{12,yy}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{K}_y\right)  +  \left(\vec{B}^{\,*}_{13,yy}\otimes\vec{J}\right)\circ
+%\left(I_y\otimes \textbf{K}_{xy}\right) + \left(\vec{B}^{\,*}_{21}\otimes\vec{J}\right)\circ
+%\left( \textbf{Q}_x\otimes I_x \right)\textbf{K}_x + \left(\vec{B}^{\,*}_{22}\otimes\vec{J}\right)\circ
+%\left( \textbf{Q}_x\otimes I_x \right)\textbf{K}_y + \left(\vec{B}^{\,*}_{23}\otimes\vec{J}\right)\circ
+%\left( \textbf{Q}_x\otimes I_x \right)\textbf{K}_{xy} + \left(\vec{B}^{\,*}_{21,xx}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_x\otimes I_x \right) + \left(\vec{B}^{\,*}_{22,xx}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_y\otimes I_x \right) +  \left(\vec{B}^{\,*}_{23,xx}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_{xy}\otimes I_x \right) \right) -2\left( \left(\vec{B}^{\,*}_{31}\otimes\vec{J}\right)\circ
+%\left( \textbf{P}_x\otimes\textbf{P}_y \right)\textbf{K}_x + \left(\vec{B}^{\,*}_{32}\otimes\vec{J}\right)\circ
+%\left( \textbf{P}_x\otimes\textbf{P}_y \right)\textbf{K}_y + \left(\vec{B}^{\,*}_{33}\otimes\vec{J}\right)\circ
+%\left( \textbf{P}_x\otimes\textbf{P}_y \right)\textbf{K}_{xy} + \left(\vec{B}^{\,*}_{31,xy}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_x\otimes I_x \right) + \left(\vec{B}^{\,*}_{32,xy}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_y\otimes I_x \right)+ \left(\vec{B}^{\,*}_{33,xy}\otimes\vec{J}\right)\circ
+%\left(\textbf{K}_{xy}\otimes I_x \right)\right)
+%\end{equation}
+
+%\begin{equation}
+%\mathbf{F_3} = -\frac{1}{2}\left(\Sigma^{-1}_{11}\circ \left(I_y\otimes {Q}_y \right)\Sigma_{Nxx} + \Sigma^{-1}_{12}\circ\left(I_y\otimes {Q}_y \right)\Sigma_{Nyy} + \Sigma^{-1}_{13}\circ\left(I_y\otimes {Q}_y \right)\Sigma_{Nxy} + \Sigma^{-1}_{21}\circ\left({Q}_x\otimes I_x \right)\Sigma_{Nxx} + \Sigma^{-1}_{22}\circ\left({Q}_x\otimes I_x \right)\Sigma_{Nyy} + \Sigma^{-1}_{21}\circ\left({Q}_x\otimes I_x \right)\Sigma_{Nxy}\right) + 2\left(\Sigma^{-1}_{31}\circ \left({Q}_x\otimes {Q}_y \right)\Sigma_{Nxx}+\Sigma^{-1}_{32}\circ \left({Q}_x\otimes {Q}_y \right)\Sigma_{Nyy}+\Sigma^{-1}_{33}\circ \left({Q}_x\otimes {Q}_y \right)\Sigma_{Nxy}\right)
+%\end{equation}
+
+
+
+\begin{align}
+\mathbf{F_3}={}& - \frac{1}{2}\left(\Gamma_{11}\tilde{N}^{th}_{xx,yy} + \Gamma_{12}\tilde{N}^{th}_{yy,yy} + \Gamma_{13}\tilde{N}^{th}_{xy,yy} + \tilde{N}^{th}_{xx}\Gamma_{11,yy} + \tilde{N}^{th}_{yy}\Gamma_{12,yy} \right. \notag\\ &+ \left. \tilde{N}^{th}_{xy}\Gamma_{13,yy} +  \Gamma_{21}\tilde{N}^{th}_{xx,xx} +  \Gamma_{22}\tilde{N}^{th}_{yy,xx} + \Gamma_{23}\tilde{N}^{th}_{xy,xx} +\tilde{N}^{th}_{xx}\Gamma_{21,xx} \right. \notag\\ &+ \left. \tilde{N}^{th}_{yy}\Gamma_{22,xx} +  \tilde{N}^{th}_{xy}\Gamma_{23,xx}\right) + \left(\Gamma_{31}\tilde{N}^{th}_{xx,xy} +  \Gamma_{32}\tilde{N}^{th}_{yy,xy}  +  \Gamma_{33}\tilde{N}^{th}_{xy,xy} \right. \notag\\ &+ \left.   \tilde{N}^{th}_{xx}\Gamma_{31,xy} + \tilde{N}^{th}_{yy}\Gamma_{32,xy} \right)
+- \left(\Gamma_{11,y}\tilde{N}^{th}_{xx,y} + \Gamma_{12,y}\tilde{N}^{th}_{yy,y} + \Gamma_{13,y}\tilde{N}^{th}_{xy,y} \right. \notag\\ &+ \left. \Gamma_{21,x}\tilde{N}^{th}_{xx,x} +  \Gamma_{22,x}\tilde{N}^{th}_{yy,x} + \Gamma_{23,x}\tilde{N}^{th}_{xy,x} -\Gamma_{31,x}\tilde{N}^{th}_{xx,y} - \Gamma_{32,x}\tilde{N}^{th}_{yy,y} \right. \notag\\ &- \left. \Gamma_{33,x}\tilde{N}^{th}_{xy,y} - \Gamma_{31,y}\tilde{N}^{th}_{xx,x} - \Gamma_{32,y}\tilde{N}^{th}_{yy,x} - \Gamma_{33,y}\tilde{N}^{th}_{xy,x}\right)
+\end{align}
+The $\mathbf{F_3}$ matrix does not contain any terms of unknown coefficient $q_{ij}$, and therefore no vectorization is required.
+\begin{eqnarray}
+\begin{aligned}
+\tilde{N} =&\mathcal{L}^{-1}{f}
+=&\tilde{\mathbf{N_1}}\vec{q} \otimes \vec{q} +\mathbf{ \tilde{N_2}}\vec{q} + \mathbf{ \tilde{N_3}}
+\end{aligned}
+\end{eqnarray}
+
+where 
+
+\begin{equation}
+\begin{aligned}
+N_1&=\mathcal{L}^{-1}\left(\mathbf{F_1}\right), \, \quad
+N_2=\mathcal{L}^{-1}\left(\mathbf{F_2}\right) , \, \quad 
+N_3&=\mathcal{L}^{-1}\left(\mathbf{F_3}\right)
+\end{aligned}
+\end{equation}
+
+\subsection{Membrane Energy}
+The membrane energy can be written as:
+\begin{align}
+	{U}_{mem}={}& 
+	\frac{1}{2}\int_{S}\left[\tilde{A}_{11}\left(x,y\right)\tilde{N}_x^2 + \tilde{A}_{12}\left(x,y\right)\tilde{N}_x\tilde{N}_y + \tilde{A}_{13}\left(x,y\right)\tilde{N}_x\tilde{N}_{xy}  \right. \notag\\ &+ \left. \tilde{A}_{21}\left(x,y\right)\tilde{N}_y\tilde{N}_x + \tilde{A}_{22}\left(x,y\right)\tilde{N}_y^2 + \tilde{A}_{23}\left(x,y\right)\tilde{N}_y\tilde{N}_{xy} \right. \notag\\ &+ \left. \tilde{A}_{31}\left(x,y\right)\tilde{N}_{xy}\tilde{N}_x + \tilde{A}_{32}\left(x,y\right)\tilde{N}_{xy}\tilde{N}_{y}+ \tilde{A}_{33}\left(x,y\right)\tilde{N}_{xy}\tilde{N}_{xy}\right]d\bar{S}
+	\label{eq:energy}
+\end{align}
+
+
+
+\begin{align}
+		{U}_{mem}={}&  \frac{1}{2}\int_{S}\left[A_{11}(x,y) \left(\mathbf{N}_{1x}\vec{q} \otimes \vec{q} + \textbf{N}_{2x}\vec{q} +\textbf{ N}_{3}\right)\circ \left(\textbf{N}_{1x}\vec{q} \otimes \vec{q} + \textbf{N}_{2x}\vec{q} + \textbf{N}_{3x}\right)  \right. \notag\\ &+ \left. A_{12}(x,y) \left(\textbf{N}_{1x}\vec{q} \otimes \vec{q} + \textbf{N}_{2x}\vec{q} + \textbf{N}_{3x}\right)\circ \left(\textbf{N}_{1y}\vec{q} \otimes \vec{q} + \textbf{N}_{2y}\vec{q} + \textbf{N}_{3y}\right)  \right. \notag\\ &+ \left. A_{13}(x,y) \left(\textbf{N}_{1x}\vec{q} \otimes \vec{q} + \textbf{N}_{2x}\vec{q} + \textbf{N}_{3x}\right)\circ \left(\textbf{N}_{1xy}\vec{q} \otimes \vec{q} + \textbf{N}_{2xy}\vec{q} + \textbf{N}_{3xy}\right)  \right. \notag\\ &+ \left. A_{21}(x,y) \left(\textbf{N}_{1y}\vec{q} \otimes \vec{q} + \textbf{N}_{2y}\vec{q} + \textbf{N}_{3y}\right)\circ \left(\textbf{N}_{1x}\vec{q} \otimes \vec{q} + \textbf{N}_{2x}\vec{q} + \textbf{N}_{3x}\right)  \right. \notag\\ &+ \left. A_{22}(x,y) \left(\textbf{N}_{1y}\vec{q} \otimes \vec{q} + \textbf{N}_{2y}\vec{q} + \textbf{N}_{3y}\right)\circ \left(\textbf{N}_{1y}\vec{q} \otimes \vec{q} + \textbf{N}_{2y}\vec{q} + \textbf{N}_{3y}\right)  \right. \notag\\ &+ \left. A_{23}(x,y) \left(\textbf{N}_{1y}\vec{q} \otimes \vec{q} + \textbf{N}_{2y}\vec{q} + \textbf{N}_{3y}\right)\circ \left(\textbf{N}_{1xy}\vec{q} \otimes \vec{q} + \textbf{N}_{2xy}\vec{q} + \textbf{N}_{3xy}\right)  \right. \notag\\ &+ \left. A_{31}(x,y) \left(\textbf{N}_{1xy}\vec{q} \otimes \vec{q} + \textbf{N}_{2xy}\vec{q} + \textbf{N}_{3xy}\right)\circ \left(\textbf{N}_{1x}\vec{q} \otimes \vec{q} + \textbf{N}_{2x}\vec{q} + \textbf{N}_{3x}\right) \right. \notag\\ &+ \left. A_{32}(x,y) \left(\textbf{N}_{1xy}\vec{q} \otimes \vec{q} + \textbf{N}_{2xy}\vec{q} + \textbf{N}_{3xy}\right)\circ \left(\textbf{N}_{1y}\vec{q} \otimes \vec{q} + \textbf{N}_{2y}\vec{q} + \textbf{N}_{3y}\right) \right. \notag\\ &+ \left. A_{33}(x,y) \left(\textbf{N}_{1xy}\vec{q} \otimes \vec{q} + \textbf{N}_{2xy}\vec{q} + \textbf{N}_{3xy}\right)\circ \left(\textbf{N}_{1xy}\vec{q} \otimes \vec{q} + N_{2xy}\vec{q} + \textbf{N}_{3xy}\right)\right]d\bar{S}
+		\label{eq:memDQM}
+\end{align}
+%
+%\begin{dmath}
+%{U}_{mem}=\frac{1}{2}\int_{S}\left[A_{11}(x,y)\left(N_{1x}\otimes N_{1x}  \right) + A_{12}(x,y)\left(N_{1x}\otimes N_{1y}\right) + A_{13}(x,y)\left(N_{1x}\otimes N_{1xy}\right) + A_{21}(x,y)\left(N_{1y}\otimes N_{1x}\right)+  A_{22}(x,y)\left(N_{1y}\otimes N_{1y}\right)   + A_{23}(x,y)\left(N_{1y}\otimes N_{1xy}\right) + A_{31}(x,y)\left(N_{1xy}\otimes N_{1x}\right) + A_{32}(x,y)\left(N_{1xy}\otimes N_{1y}\right) + A_{33}(x,y)\left(N_{1xy}\otimes N_{1xy}\right)\right]\vec{q} \otimes \vec{q} \otimes \vec{q} \otimes \vec{q} + \frac{1}{2}\left[A_{11}(x,y)\left(N_{2x}\otimes N_{2x}  \right) + A_{12}(x,y)\left(N_{2x}\otimes N_{2y}\right) + A_{13}(x,y)\left(N_{2x}\otimes N_{2xy}\right) + A_{21}(x,y)\left(N_{2y}\otimes N_{21x}\right)+  A_{22}(x,y)\left(N_{2y}\otimes N_{2y}\right)   + A_{23}(x,y)\left(N_{2y}\otimes N_{2xy}\right) + A_{31}(x,y)\left(N_{2xy}\otimes N_{2x}\right) + A_{32}(x,y)\left(N_{2xy}\otimes N_{2y}\right) + A_{33}(x,y)\left(N_{2xy}\otimes N_{2xy}\right)\right]
+%\end{dmath}
+
+
+\begin{equation}
+	U_{mem}=\mathds{\textbf{P}}\vec{q} \otimes \vec{q} \otimes \vec{q} \otimes \vec{q}  + \mathds{\textbf{Q}}\vec{q} \otimes \left( \vec{q} \otimes \vec{q}\right) + \mathds{\textbf{R}}\vec{q} \otimes \vec{q} +  \mathds{\textbf{S}}\vec{q} + \mathds{\textbf{T}}
+\end{equation}
+
+The rest of the terms for the total strain energy, namely, the bending components and due to thermal loads can be calculated in a straight-forward manner using Eq. \ref{eqn:totalennd}. These terms doesn't need to be vectorized.
+%The values of $\textbf{P}}$, $\textbf{Q}}$, $\textbf{R}}$, $\textbf{S}}$ and $\textbf{T}}$ can be found be solving Eq. \ref{eq:memDQM}
+%\section{Equilibirium and Stability}
+%The in-plane stresses 
+\section{Finite Element Analysis}
+A nonlinear FE analysis is performed to compare the snap-through predicted using the formulated approach. A total of 2304 four-node quadrilateral shell elements (S4R) were used to simulate the curing and the snap-through process of VS laminates . The curing process is simulated by using a predefined uniform temperature field over the entire domain under analysis. The composite plate is allowed to cool down from curing temperature to room temperature, resulting in a two stable configuration. The plate is considered to be fixed at the center node during the cool-down process to preclude rigid body motions. Subsequently, an external load is applied to the obtained cured shape. 
+A particular load is found out that triggers the snap-through process. Finally, the applied load is removed so that the plate comes to equilibrium and returns to the second stable shape. The snap-through is a dynamic process and requires a stabilization technique to damp the local instabilities. Therefore, numerical stabilization is introduced in the form of viscous forces or damping when instabilities are detected at the stiffness matrix of the system.
+
+The curvilinear fiber path in the variable stiffness composite is approximated by considering a piecewise function, where each element assumes a straight fiber orientation. The corresponding fiber angle at each element is computed at its centroid from Eq. \ref{fibdef2}. It is quite obvious that with finer mesh the approximation of the curved fiber paths is improved. Mesh convergence studies were carried out, and a particular mesh size of 2304 elements was chosen to achieve a good balance between the computational effort and precision of the analysis. 
+
+To model the fibers using shifted method (\cite{Waldhart1996}) a reference fiber path passing through the origin is defined. The other fiber paths are generated by directly translating the reference fiber path in the direction of the $y'$ axis. However, for $\phi=0$, the set of elements that have the same fiber orientation is parallel to the rectangular Cartesian $y$ axis. However, for $\phi$=$45{^\circ}$, the new coordinate axes ($x'$ and $y'$) is rotated by $45{^\circ}$ with the Cartesian coordinate axes. 
+
+
+
+\section{Results}
+The laminates studied are square and have a length L equal to 200 mm, with eight layers each of 0:131mm-thick plies of graphite-epoxy prepreg. The material properties at ply-level are given as:
+
+\begin{equation}
+\begin{aligned}
+E_1 &= 164 \: \text{GPa}, \; E_2 = 12\: \text{GPa}, \; G_{12}= 4.6 \: \text{GPa} \\
+\nu_{12} &= 0.3, \; \alpha_1= -1.8 \times 10^{-8}/ {^\circ} \text{C} , \; \alpha_2= 3 \times 10^{-5}/ {^\circ} \text{C}
+\end{aligned}
+\label{matprop}
+\end{equation}
+\begin{figure}[!htb]
+	\captionsetup[subfloat]{farskip=0.5pt,captionskip=2pt}
+	\centering
+	\subfloat[][]
+	{
+		\includegraphics[width=.30\textwidth]{figures2/fig1575.pdf}
+		\label{fig:wdispa_cs1}
+	}\hspace{0.5 cm}
+	\subfloat[][]
+	{
+		\includegraphics[width=.30\textwidth]{figures2/3060.pdf}
+		\label{fig:wdispb_cs1}
+	}
+	
+	\subfloat[][]
+	{
+		\includegraphics[width=.30\textwidth]{figures2/6030.pdf}
+		\label{fig:wdispc_cs1}
+	}\hspace{0.5 cm}
+	\subfloat[][]
+	{
+		\includegraphics[width=.30\textwidth]{figures2/7515.pdf}
+		\label{fig:wdispd_cs1}
+	}
+	\caption{Investigated VS composites a) VS-1 b) VS-2 c) VS-3 d) VS-4. All of them yield cylindrical bistable shapes similar to unsymmetric cross-ply laminate $[0_4/90_4]$}
+	\label{fig:fiberpaths}
+\end{figure}
+\begin{table}[!h]
+	\centering
+	\setlength{\arrayrulewidth}{2pt}
+	\begin{tabular}{lcccc}
+		\hline
+		{Type} & {$\phi$} & {$T_0$}  & {$T_1$} & {Layup}\\
+		\hline
+		{Straight} & {$45$}& {$45$} & {$45$} &{$\left[0_4/90_4\right]_{T}$}\\
+		{VS-1}  & {$45$}& {$\pm 15$} & {$\pm 75$} & {$[45\langle{15|75 \rangle}_4/45\langle {-15|-75 \rangle}_4]_{T}$}\\
+		{VS-2}  & {$45$}& {$\pm 30$} & {$\pm 60$} & {$[45\langle{30|60 \rangle}_4/45\langle {-30|-60 \rangle}_4]_{T}$}\\
+		{VS-3} & {$45$} & {$\pm 60$} & {$\pm 30$} & {$[45\langle{60|30 \rangle}_4/45\langle {-60|-30 \rangle}_4]_{T}$}\\ 
+		{VS-4} & {$45$} & {$\pm 75$} & {$\pm 15$} & {$[45\langle{75|15 \rangle}_4/45\langle {-75|-15 \rangle}_4]_{T}$}\\
+		\hline
+	\end{tabular}
+	\vspace{5 mm}
+	\caption{Fiber orientation and layup data for the investigated straight cross-ply and various VS composites}
+	\label{data122}
+\end{table}
+\begin{figure}[!htb]
+	\captionsetup[subfloat]{farskip=0.5pt,captionskip=2pt}
+	\centering	
+	\includegraphics[width=.70\textwidth]{figures2/drawing.pdf}
+	\label{fig:shapes}
+\end{figure}
+
+
+%phi=0\\
+%plot here nxx \\
+%nyy\\
+%nxy\\
+%comparison with FE\\
+%Table for outof plane displacements with vs-1,vs-2 and vs-3 and vs-4. x=0 and y=0 planes\\
+%Table with difference with FE\\
+%Snap through load differentce\\
+%vs-1
+%nx=2,3,4,5
+%Order 4
+%change in difference with number of grid\\
+%\section*{$\phi=0$}
+%phi=0\\
+%plot here nxx \\
+%nyy\\
+%nxy\\
+%comparison with FE\\
+%Figures for outof plane displacements with vs-1,vs-2 and vs-3 and vs-4. x=0 and y=0 planes\\
+%Figure with difference with FE\\
+
+%\begin{table}[!htb]
+%	\centering
+%	\setlength{\arrayrulewidth}{2pt}
+%	%\begin{tabular}{|p{3cm}||p{3cm}|p{3cm}| }
+%	\begin{tabular}{lccccccc}
+%		\hline
+%		% \multicolumn{3}{|c|}{Ord. 2} \\
+%		% \hline
+%		Order & n=2 & n=3 & n=4 & n= 5 & FE & Error(\%)\\
+%		\hline
+%		VS-1   & 10    & 10 & 10 & 10 & 10 & 0.1  \\
+%		VS-2  & 10    & 10 & 10 & 10 & 10 & 0.1  \\
+%		VS-3  & 10    & 10 & 10 & 10 & 10 & 0.1  \\
+%		VS-4  & 10    & 10 & 10 & 10 & 10 & 0.1  \\
+%		Straight [$0_4/90_4$]  & 10    & 10 & 10 & 10 & 10 & 0.1  \\
+%		\hline
+%	\end{tabular}
+%	\vspace{5 mm}
+%	\caption{Comparison between the snap-through loads with the formulated DQM method and FE}
+%	\label{data122}
+%\end{table}
+
+
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+
+
+\begin{table}[!h]
+	\begin{tabular}{@{}llllllllll@{}}
+		\hline
+		\multirow{ 2}{*}{$T_0$}
+		&
+		\multirow{ 2}{*}{$T_1$}
+		& \multicolumn{2}{l}{$n=2$}                                        & \multicolumn{2}{l}{$n=3$}                                                                            & \multicolumn{2}{l}{$n=4$}                                                                            & \multicolumn{2}{l}{$n=5$}                                                                            \\ \cline{3-10}
+
+	{}	         & {}     &$w_1$ &$w_2$  &$w_1$ &$w_2$  &$w_1$  &$w_2$ &$w_1$  &$w_2$ \\ \hline
+		15         & 75        & 0.06034
+                                                 &  0.03474                                                & 0.05019                                                 & 0.03849                                                 & 0.04912                                                 & 0.03808                                                 & 0.04944                                                 & 0.03799                                                 \\
+		30         & 60        & 0.06700                                                 & 0.05081                                                 &0.06433                                                  & 0.05200                                                  &0.06334                                                  & 0.05150                                                 &                                                  &                                                  \\ 
+		60         & 30        & 0.06631                                                 &0.05175                                                  &0.06581                                                    & 0.05211                                                 &  0.06452                                             &  0.05021                                                & 0.6450                                                 &0.05022                                                  \\ 
+		75         & 15        &0.06156                                                  &0.03411                                                  & 0.05314                                                  & 0.03858                                                  & 0.053212                                                 & 0.03413                                                 & 0.05315                                                 & 0.03365                                                 \\ 
+		45         & 45        &                                                  &                                                  &                                                  &                                                  &                                                  &                                                  &                                                  &                                                  \\ \hline
+	\end{tabular}
+\label{disp}
+\caption{Corner displacements-- in ($m$)}
+\end{table}
+
+\begin{table}[!h]
+	\begin{tabular}{@{}lllllllllll@{}}
+		\hline
+		\multirow{ 2}{*}{$T_0$}
+		&
+		\multirow{ 2}{*}{$T_1$}
+		& \multicolumn{2}{l}{$n=2$}                                        & \multicolumn{2}{l}{$n=3$}                                                                            & \multicolumn{2}{l}{$n=4$}                                                                            & 
+		\multicolumn{2}{l}{$n=5$}    
+	     & 
+	    \multirow{ 2}{*}{FE}         \\ \cline{3-10}     
+		
+		{}	         & {}     &Force &Error  &Force &Error  &Force &Error  &Force &Error &{} \\ \hline
+		15         & 75        & 1.97
+		&  0.00                                                & 1.91                                                 & 0.0                                                 & 1.395                                                 & 0                                                & 1.3                                                & 0.0         &1.29                                        \\
+		30         & 60        & 3.36                                                 & 0                                                 & 3.24                                                  & 0                                                  &2.75                                                  &0.0                                                 &                                                  &        &2.63                                           \\ 
+		60         & 30        & 6.22                                                 &0                                                  &5.56                                                      & 0                                                 &  3.31                                             &  0.0                                                & 3.29                                                 &0.0   &3.17                                                \\ 
+		75         & 15        &4.66                                                  &0.0                                                  & 4.20                                               &0.0                                                   & 2.15                                                 &0.0                                                 &1.83                                                  & 0.0   &2.0                                             \\ 
+		45         & 45        & 4.98                                                 & 48.6                                                 &   4.32                                               & 28.9                                                 & 3.97                                                 & 18.5                                                 & 3.65                                                 &  8.96      &3.35                                          \\ \hline
+	\end{tabular}
+	\label{disp}
+	\caption{Snap-through Loads-- in ($N$)}
+\end{table}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%\begin{table}[!htb]
+%	\centering
+%	\setlength{\arrayrulewidth}{2pt}
+%	%\begin{tabular}{|p{3cm}||p{3cm}|p{3cm}| }
+%	\begin{tabular}{lcccccc}
+%		\hline
+%		% \multicolumn{3}{|c|}{Ord. 2} \\
+%		% \hline
+%		Order & n=12 & n=8 & n=32 & n=42 & Error(\%)\\
+%		\hline
+%		VS-1   & 10    & 10 & 10 & 10 & 0.1  \\
+%		VS-2  & 10    & 10 & 10 & 10 & 0.1  \\
+%		VS-3  & 10    & 10 & 10 & 10 & 0.1  \\
+%		VS-4  & 10    & 10 & 10 & 10 & 0.1  \\
+%		Straight [$0_4/90_4$]  & 10    & 10 & 10 & 10 & 0.1  \\
+%		\hline
+%	\end{tabular}
+%	\vspace{5 mm}
+%	\caption{Comparison between the snap-through loads with the formulated DQM method and FE, order 4}
+%	\label{data122}
+%\end{table}
+\section*{$\phi=45$}
+phi=45\\
+
+\begin{figure}[!h]
+	\centering 
+	\setlength\fheight{4cm} 
+	\setlength\fwidth{4cm} 
+     \input{figures2/chkx0.tikz} 
+     \label{plotx0}
+\end{figure}
+
+
+\begin{figure}[!h]
+	\centering 
+	\setlength\fheight{8cm} 
+	\setlength\fwidth{8cm} 
+	\input{figures2/chkx0diff.tikz} 
+	\label{plotx0diff}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering 
+	\setlength\fheight{8cm} 
+	\setlength\fwidth{8cm} 
+	\input{figures2/chky0.tikz} 
+	\label{ploty0}
+\end{figure}
+
+\begin{figure}[!h]
+	\centering 
+	\setlength\fheight{8cm} 
+	\setlength\fwidth{8cm} 
+	\input{figures2/chky0diff.tikz} 
+	\label{plotydiff}
+\end{figure}
+
+
+\begin{table}[!htb]
+	\centering
+	\setlength{\arrayrulewidth}{2pt}
+	%\begin{tabular}{|p{3cm}||p{3cm}|p{3cm}| }
+	\begin{tabular}{lcccccc}
+		\hline
+		% \multicolumn{3}{|c|}{Ord. 2} \\
+		% \hline
+		Order & n=12 & n=22 & n=32 & n=42 & Error(\%)\\
+		\hline
+		VS-1   & 10    & 10 & 10 & 10 & 0.1  \\
+		VS-2  & 10    & 10 & 10 & 10 & 0.1  \\
+		VS-3  & 10    & 10 & 10 & 10 & 0.1  \\
+		VS-4  & 10    & 10 & 10 & 10 & 0.1  \\
+		Straight [$0_4/90_4$]  & 10    & 10 & 10 & 10 & 0.1  \\
+		\hline
+	\end{tabular}
+	\vspace{5 mm}
+	\caption{Comparison between the snap-through loads with the formulated DQM method and FE, order 4}
+	\label{phi45st2  }
+\end{table}
+
+\section{Determination of Membrane Energy}
+\begin{figure}[!htb]
+	\captionsetup[subfloat]{farskip=0.5pt,captionskip=2pt}
+	\centering
+	\subfloat[][]
+	{
+		\includegraphics[width=.40\textwidth]{figures2/nxx6030.pdf}
+		\label{fig:wdispa_cs1}
+	}\hspace{0.1cm}
+	\subfloat[][]
+	{
+		\includegraphics[width=.31\textwidth]{figures2/nxx6030fe.pdf}
+		\label{fig:wdispb_cs1}
+	}
+	\\
+	\subfloat[][]
+	{
+		\includegraphics[width=.40\textwidth]{figures2/nyy6030clp.pdf}
+		\label{fig:wdispc_cs1}
+	}\hspace{0.2 cm}
+	\subfloat[][]
+	{
+		\includegraphics[width=.335\textwidth]{figures2/nyy6030feclp.pdf}
+		\label{fig:wdispd_cs1}
+	}
+\\
+	\subfloat[][]
+	{
+		\includegraphics[width=.40\textwidth]{figures2/nxy6030.pdf}
+		\label{fig:wdispa_cs1}
+	}\hspace{0.2 cm}
+	\subfloat[][]
+	{
+		\includegraphics[width=.335\textwidth]{figures2/nxy6030fe.pdf}
+		\label{fig:wdispb_cs1}
+	}
+
+	\caption{Investigated VS composites for $VS-3$ comparing the membrane stresses obtained from analytical method and FE: stress distribution $N_{xx}$ a) DDQM b) FE, stress distribution $N_{yy}$ a)DQM b) FE, stress distribution $N_{xy}$ a)DQM b) FE  }
+	\label{fig:fiberpaths}
+\end{figure}
+
+\section{Parameteric Study}
+phi= 0, one graph with change in t0 and t1, change in snapthrough and out-of-plane disp
+\\
+phi= 45, one graph with change in t0 and t1, change in snapthrough and out-of-plane disp
+
+A geometrically nonlinear FE calculation was carried out in ABAQUS to simulate the snap-through process. The snap-through loads of several VS laminates described in Table \ref{data1} were calculated. The studied VS are depicted in Fig. \ref{fig:fiberpaths}. 
+
+%$\Bigg \langle 3x+7 \bigg \rangle$
+
+A certain family of VS laminates was chosen which satisfies, $\phi=0$ and $T_0+T_1=90$. Such laminates result in an average fiber orientation of  $[0_4/90_4]$, and therefore yields cylindrical shape with almost zero twisting curvature. In this paper, the snap-through loads and out-of-plane displacement is calculated from the developed analytical model and compared with FE results.  
+
+The details of the VS laminate layup is given in Table \ref{data1}. All the investigated VS laminates yields cylindrical stable shape with almost zero twisting curvatures(Fig. \ref{fig:shapes}).  Fig. \ref{fig:rxn} shows the plot between the total reaction forces with the out-of-plane displacement. It can be observed that with the applied load, the structure deforms elastically featuring linear load-displacement curves. Once the critical point is detected, the structure snaps from one stable shape to another. It can be seen from the Fig. \ref{fig:rxn} that values of snap-through loads varies between different VS laminates. The value of snap forces are lower than $[0_4/90_4]$ cross-ply laminate for VS laminate satisfying $T_1>T_0$, whereas higher for VS laminates satisfying $T_1>T_0$. 
+The snap-through force can be directly determined from the load-displacement curve. It can be observed from the figure that among all the laminates investigated, VS-4 requires the maximum snap-through force ($76.5$ N) followed by VS-3 ($71.0$ N), VS-1 ($25.7$ N) and VS-2 ($20.2$ N). The straight fiber cross-ply $[0_4/90_4]$ requires a snap-through force of $36.8$N, the value of whose are verified from the calculation carried out by Diaconu et al. \cite{Diaconu2009}. It can be observed that laminate VS-2 has $45\%$ lower snap-through forces than the straight cross-ply laminate, with a just $14\%$ lower out-of-plane displacement. It can be therefore observed that with VS laminate, there can be immense possibility to tailor the snap-through loads without much change in the shape of the bistable laminate. Such snap-through tailoring make VS laminates a promising option to be used in efficient morphing systems.
+%\begin{table}[!htb]
+%	\centering
+%	\begin{tabular}{@{} l *5{d{2.6}} @{} } 
+%		\hline
+%		\mc{Laminate} & \mc{$[0_4/90_4]_\text{T}$}  &\mc{VS-1} &\mc{VS-2}  &\mc{VS-3} &\mc{VS-4}\\
+%		\hline
+%			\mc{FEM}   & 	\mc{36.8}  &  \mc{25.7} &   \mc{20.2} &  \mc{71.0} & \mc{76.4}\\
+%		\hline
+%	\end{tabular}
+%	\vspace{5 mm}
+%	\caption{Snap-through forces for plates with straight fibers and VS composites-in (N) }
+%	\label{datasnap}
+%\end{table}
+
+%\begin{table}[!htb]
+%	\centering
+%	\setlength{\arrayrulewidth}{2\arrayrulewidth}
+%	\begin{tabular}{lcccc}
+%		\hline
+%		{Type} & {$\phi$} & {$T_0$}  & {$T_1$} & {Layup}\\
+%		\hline
+%		{Straight} & {$45$}& {$\pm 45$} & {$\pm 45$} &{$\left[0_4/90_4\right]_\text{T}$}\\
+%		{VS-1}  & {$45$}& {$\pm 15$} & {$\pm 75$} & {$[45\langle{15|75 \rangle}_4/45\langle {-15|-75 \rangle}_4]_\text{T}$}\\
+%		{VS-2}  & {$45$}& {$\pm 30$} & {$\pm 60$} & {$[45\langle{30|60 \rangle}_4/45\langle {-30|-60 \rangle}_4]_\text{T}$}\\
+%		{VS-3} & {$45$} & {$\pm 60$} & {$\pm 30$} & {$[45\langle{60|30 \rangle}_4/45\langle {-60|-30 \rangle}_4]_\text{T}$}\\ 
+%		{VS-4} & {$45$} & {$\pm 75$} & {$\pm 15$} & {$[45\langle{75|15 \rangle}_4/45\langle {-75|-15 \rangle}_4]_\text{T}$}\\
+%		\hline
+%	\end{tabular}
+%	\vspace{5 mm}
+%	\caption{Fiber orientation and layup data for the investigated straight cross-ply and various VS composites}
+%	\label{data1}
+%\end{table}
+
+\begin{figure}[!htb]
+	\captionsetup[subfloat]{farskip=2pt,captionskip=2pt}
+	\centering
+	{
+		\def\tkzscl{0.5}     
+		\input{figures2/lddispvs2.tikz}          
+	}
+	\caption{Reaction force-displacement diagram showing the intermediate unstable path}
+	\label{fig:rxn}
+\end{figure}
+
+\begin{figure}[!htb]
+	\captionsetup[subfloat]{farskip=2pt,captionskip=2pt}
+	\centering
+	{
+		\def\tkzscl{0.5}     
+		\input{figures2/strlddisp.tikz}          
+	}
+	\caption{Reaction force-displacement diagram showing the intermediate unstable path}
+	\label{fig:rxn}
+\end{figure}
+
+
+\begin{figure}[!h]
+	\captionsetup[subfloat]{farskip=2pt,captionskip=2pt}
+	\centering
+	{
+		\def\tkzscl{0.6}     
+		\input{figures2/ldddispFE6030.tex}          
+	}
+	\caption{Reaction force-displacement diagram showing the intermediate unstable path for $3060$}
+	\label{fig:rxn}
+\end{figure}
+
+\begin{figure}[!h]
+	\captionsetup[subfloat]{farskip=2pt,captionskip=2pt}
+	\centering
+	{
+%		\def\tkzscl{0.3}     
+		\input{figures2/lddispcomp1575.tikz}          
+	}
+	\caption{Analytical force-displacement diagram showing the intermediate unstable path for $1575$}
+	\label{fig:rxn}
+\end{figure}
+
+%\begin{figure}[!htb]
+%	\captionsetup[subfloat]{farskip=2pt,captionskip=2pt}
+%	\centering
+%	{
+%		\def\tkzscl{0.6}     
+%		\input{figures2/rxnforcephi45.tikz}          
+%	}
+%	\caption{Reaction force-displacement diagram showing the intermediate unstable path}
+%	\label{fig:rxn}
+%\end{figure}
+
+%\begin{table}[!htb]
+%	\centering
+%	\begin{tabular}{@{} l *5{d{2.6}} @{} } 
+%		\hline
+%		\mc{Laminate} & \mc{$[0_4/90_4]_\text{T}$}  &\mc{VS-1} &\mc{VS-2}  &\mc{VS-3} &\mc{VS-4}\\
+%		\hline
+%			\mc{FEM}   & 	\mc{36.8}  &  \mc{25.7} &   \mc{20.2} &  \mc{71.0} & \mc{76.4}\\
+%		\hline
+%	\end{tabular}
+%	\vspace{5 mm}
+%	\caption{Snap-through forces for plates with straight fibers and VS composites-in (N) }
+%	\label{datasnap}
+%\end{table}
+\subsection{Table showing results for different DQ grids and orders}
+
+%\begin{table}[!htb]
+%	\centering
+%	\setlength{\arrayrulewidth}{2pt}
+%	\begin{tabular}{lcccc}
+%		\hline
+%		{Type} & {$\phi$} & {$T_0$}  & {$T_1$} & {Layup}\\
+%		\hline
+%		{Type} & {$\phi$} & {$T_0$}  & {$T_1$} & {Layup}\\
+%		\hline
+%		{Straight} & {$45$}& {$45$} & {$45$} &{$\left[0_4/90_4\right]_{T}$}\\
+%		{VS-1}  & {$45$}& {$\pm 15$} & {$\pm 75$} & {$[45\langle{15|75 \rangle}_4/45\langle {-15|-75 \rangle}_4]_{T}$}\\
+%		{VS-2}  & {$45$}& {$\pm 30$} & {$\pm 60$} & {$[45\langle{30|60 \rangle}_4/45\langle {-30|-60 \rangle}_4]_{T}$}\\
+%		{VS-3} & {$45$} & {$\pm 60$} & {$\pm 30$} & {$[45\langle{60|30 \rangle}_4/45\langle {-60|-30 \rangle}_4]_{T}$}\\ 
+%		{VS-4} & {$45$} & {$\pm 75$} & {$\pm 15$} & {$[45\langle{75|15 \rangle}_4/45\langle {-75|-15 \rangle}_4]_{T}$}\\
+%		\hline
+%	\end{tabular}
+%	\vspace{5 mm}
+%	\caption{Fiber orientation and layup data for the investigated straight cross-ply and various VS composites}
+%	\label{data122}
+%\end{table}
+
+
+
+%\begin{table}[!htb]
+%	\centering
+%	\setlength{\arrayrulewidth}{2pt}
+%	%\begin{tabular}{|p{3cm}||p{3cm}|p{3cm}| }
+%	\begin{tabular}{lcccc}
+%		\hline
+%		% \multicolumn{3}{|c|}{Ord. 2} \\
+%		% \hline
+%		Order & Snap-through Force (DQM) & Snap-through Force (FE) & Error(\%)\\
+%		\hline
+%		VS-1   & AF    & 19.1 \\
+%		VS-2 &   AX  &  17.8 \\
+%		VS-3 &AL & 5.1\\
+%		VS-4  &DZ & 6.5\\
+%		Straight [0_4/90_4]  &DZ & 9.2\\
+%		\hline
+%	\end{tabular}
+%	\vspace{5 mm}
+%	\caption{Comparison between the snap-through loads with the formulated DQM method and FE}
+%	\label{data122}
+%\end{table}
+
+
+\subsection{Comparison of Bending and Membrane Energies for different VS laminates}
+Figure here \\
+\\
+\section{Conclusion}
+In this paper, the concept of variable stiffness using curvilinear fiber path is exploited to tailor the snap through loads of bistable laminates. Based on the previous work of Lamacchia et al.\cite{Lamacchia2015}, a robust and computationally efficient formulation to calculate the snap-through force of VS laminates were derived. A corresponding FE model was developed to compare the results of the formulated analytical method. It can be observed from the FE results, that by changing the angle parameters defining the VS  laminates, snap-through could be tailored. Such VS composites can advantageously be embedded as a component in a larger structure to achieve morphing, with lower or higher snap-through forces as per requirement.
+
+\section{Parameteric Study}
+
+\begin{table}[]
+	\begin{tabular}{lllll}
+		\hline
+		$T_0$ & $T_1$ & $w_1$       & $w_2$       & ST     \\
+		\hline
+		5  & 85 & 0,0272 & 0,0349 & 1,705  \\
+		10 & 80 &        &        &        \\
+		15 & 75 & 0,0364 & 0,0481 & 1,56   \\
+		20 & 70 & 0,0390 & 0,0514 & 2,045  \\
+		25 & 65 & 0,0429 & 0,0551 & 2,3925 \\
+		30 & 60 & 0,0494 & 0,0608 & 2,63   \\
+		35 & 55 & 0,0512 & 0,0594 & 3,1    \\
+		40 & 50 & 0,0551 & 0,0596 & 3,325  \\
+		45 & 45 & 0,0581 & 0,0581 & 3,35   \\
+		50 & 40 & 0,0599 & 0,0553 & 3,445  \\
+		55 & 35 & 0,0601 & 0,0513 & 3,4825 \\
+		60 & 30 & 0,0627 & 0,0490 & 3,17   \\
+		65 & 25 & 0,0567 & 0,0419 & 2,725  \\
+		70 & 20 & 0,0537 & 0,0370 & 2,36   \\
+		75 & 15 & 0,0516 & 0,0325 & 2      \\
+		80 & 10 & 0,0450 & 0,0269 & 1,8625 \\
+		85 & 5  &        &        &        \\
+		90 & 0  &        &        & 1,5625\\
+		\hline
+	\end{tabular}
+\end{table}
+\section*{Acknowledgments}
+
+The last author wishes to thank the Science Foundation Ireland for funding Varicomp under its Research Professor scheme.
+\newpage
+
+\bibliography{smartbib_nodoi}
+
+
+\end{document}
+
+% - Release $Name:  $ -

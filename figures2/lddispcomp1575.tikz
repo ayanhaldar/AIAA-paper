@@ -1,0 +1,189 @@
+% This file was created by matlab2tikz.
+%
+%The latest updates can be retrieved from
+%  http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz-matlab2tikz
+%where you can also make suggestions and rate matlab2tikz.
+%
+\definecolor{mycolor1}{rgb}{0.0,0.0,0.6}%
+\definecolor{mycolor2}{rgb}{0.25,0.37,1.0}%
+\definecolor{mycolor3}{rgb}{0.4,0.7,1.0}%
+\definecolor{mycolor4}{rgb}{0.8,0.9,1}%
+\definecolor{mycolor5}{rgb}{0.80,0.0,0.0}%
+%
+\begin{tikzpicture}[thick,scale=0.75, every node/.style={transform shape}]
+\begin{axis}[%
+width=4.521in,
+height=3.566in,
+at={(0.758in,0.481in)},
+scale only axis,
+xmin=-0.06,
+xmax=0.06,
+scaled x ticks = false,
+x tick label style={/pgf/number format/fixed},
+ymin=-2.5,
+ymax=2.5,
+axis background/.style={fill=white},
+xmajorgrids,
+xminorgrids,
+ymajorgrids,
+yminorgrids,
+xtick distance=0.02,
+legend style={legend cell align=left, align=left, draw=white!15!black}
+]
+\addplot [color=mycolor1,line width=1.5pt]
+  table[row sep=crcr]{%
+-0.050195051		0\\
+-0.048738958		0.1\\
+-0.047298489		0.2\\
+-0.045868858		0.3\\
+-0.044445269		0.4\\
+-0.043022801		0.5\\
+-0.041596272		0.6\\
+-0.040160084		0.7\\
+-0.038708012		0.8\\
+-0.037232926		0.9\\
+-0.0357264			1\\
+-0.034178124		1.1\\
+-0.032574999		1.2\\
+-0.030899628		1.3\\
+-0.029127644		1.4\\
+-0.027222519		1.5\\
+-0.025124141		1.6\\
+-0.022718562		1.7\\
+-0.019727004		1.8\\
+-0.014668373		1.9\\
+-0.01347594			1.91\\
+};
+\addlegendentry{n=3}
+
+\addplot [color=mycolor2,dashed, line width=1.5pt]
+table[row sep=crcr]{%
+	-0.01347594			1.91\\
+	-0.009321122	1.9\\
+	-0.009429901	1.8\\
+	-0.009529931	1.7\\
+	-0.009617468	1.6\\
+	-0.009686808	1.5\\
+	-0.009728686	1.4\\
+	-0.009726397	1.3\\
+	-0.009643795	1.2\\
+	-0.009364779	1.1\\
+};
+
+
+
+\addplot [color=mycolor2,dashed,line width=1.5pt]
+table[row sep=crcr]{%
+	-0.004732313	0\\
+	-0.004880751	0.1\\
+	-0.00502821		0.2\\
+	-0.005173814	0.3\\
+	-0.005316539	0.4\\
+	-0.005455233	0.5\\
+	-0.005588668	0.6\\
+	-0.005715616	0.7\\
+	-0.005834884	0.8\\
+	-0.005945167	0.9\\
+	-0.006045323	1\\
+		-0.009364779	1.1\\
+%	-0.006134723	1.1\\
+%	-0.006213008	1.2\\
+%	-0.006280014	1.3\\
+%	-0.006335798	1.4\\
+%	-0.006380609	1.5\\
+%	-0.006414848	1.6\\
+%	-0.006439021	1.7\\
+%	-0.006453696	1.8\\
+%	-0.006459468	1.9\\
+};
+
+\addplot [color=mycolor2,dashed,line width=1.5pt]
+table[row sep=crcr]{%
+	-0.004732313	0\\
+	-0.004583618	-0.1\\
+	-0.004435243	-0.2\\
+	-0.00428763	-0.3\\
+	-0.00414111	-0.4\\
+	-0.003995914	-0.5\\
+	-0.003852194	-0.6\\
+	-0.003710036	-0.7\\
+	-0.003569474	-0.8\\
+	-0.003430501	-0.9\\
+	-0.003293074	-1\\
+	0.00936471	-1.1\\
+%	-0.003157125	-1.1\\
+%	-0.003022561	-1.2\\
+%	-0.002889275	-1.3\\
+%	-0.002757141	-1.4\\
+%	-0.002626019	-1.5\\
+%	-0.002495757	-1.6\\
+%	-0.002366187	-1.7\\
+%	-0.00223713	-1.8\\
+%	-0.002108385	-1.9\\
+};
+
+\addplot [color=mycolor2,dashed,line width=1.5pt]
+table[row sep=crcr]{%
+	0.0135168	-1.91\\
+	0.009321055	-1.9\\
+	0.009429833	-1.8\\
+	0.009529864	-1.7\\
+	0.0096174	-1.6\\
+	0.00968674	-1.5\\
+	0.009728618	-1.4\\
+	0.009726328	-1.3\\
+	0.009643726	-1.2\\
+	0.00936471	-1.1\\
+};
+
+
+\addplot [color=mycolor1,line width=1.5pt]
+table[row sep=crcr]{%
+0.050195155	0\\
+0.048739047	-0.1\\
+0.047298569	-0.2\\
+0.045868934	-0.3\\
+0.044445347	-0.4\\
+0.043022887	-0.5\\
+0.041596375	-0.6\\
+0.040160213	-0.7\\
+0.038708178	-0.8\\
+0.037233143	-0.9\\
+0.035726685	-1\\
+0.034178502	-1.1\\
+0.032575501	-1.2\\
+0.030900299	-1.3\\
+0.029128552	-1.4\\
+0.027223773	-1.5\\
+0.02512594	-1.6\\
+0.022721326	-1.7\\
+0.019732002	-1.8\\
+0.014689927	-1.9\\
+0.0135168	-1.91\\
+};
+
+
+\end{axis}
+\node[inner sep=0pt] (ss1) at (3.3,5.2)
+{\includegraphics[width=.15\textwidth]{figures2/ss-1_f0.pdf}};
+
+\node[inner sep=0pt] (ss1) at (5.7,9.9)
+{\includegraphics[width=.15\textwidth]{figures2/ss-1_f1,91.pdf}};
+
+\node[inner sep=0pt] (ss1) at (7.658,8.3)
+{\includegraphics[width=.15\textwidth]{figures2/us-1_f1,6.pdf}};
+
+\node[inner sep=0pt] (ss1) at (8.34,5)
+{\includegraphics[width=.15\textwidth]{figures2/us-1_f0.pdf}};
+
+\node[inner sep=0pt] (ss1) at (9.25,1.7)
+{\includegraphics[width=.13\textwidth]{figures2/ss-2_f1,91.pdf}};
+
+\node[inner sep=0pt] (ss1) at (11.66,5.8)
+{\includegraphics[width=.13\textwidth]{figures2/ss-2_f0.pdf}};
+
+\end{tikzpicture}%
+
+
+
+
